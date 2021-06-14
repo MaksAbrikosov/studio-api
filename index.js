@@ -2,9 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const { readdir } = require( "fs/promises");
 const FormData = require("form-data");
-const axios = require("axios");
 const config = require("./config.js");
-
 
 const getAllAdvertisers = require("./functions/getAllAdvertisers");
 const getAllCampaigns = require("./functions/getAllCampaigns");
@@ -43,16 +41,13 @@ async function start() {
   const directoryPath = path.join(__dirname, "creatives");
 
   try {
+    // read creatives folder
     const folders = await readdir(directoryPath);
     for (const creativeName of folders)
     {
       let filePath = path.join(directoryPath, creativeName);
       const form = new FormData();
       form.append("folder", fs.createReadStream(filePath));
-
-      // const creativeSize = creativeName.split("_")[1];
-      // const creativeWidth = creativeSize.split('x')[0];
-      // const creativeHeight = creativeSize.split('x')[1];
 
       const creative = creatives.records.find((item) => item.name === creativeName);
       let creativeId;
@@ -64,20 +59,26 @@ async function start() {
         console.log(`Creative ${creativeName} has already exist! Updating...!`)
 
         //TODO - fix var
-        var {assetsArray, backupImage} = await getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId)
+        var {assetsArray, backupImage} = getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId);
 
-        if(assetsArray.length > 0){
-          await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId)
-          console.log('Assets deleted')
+        if(assetsArray && assetsArray.length > 0){
+          console.log('assetsArray', assetsArray);
+          await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId);
+          console.log('Assets deleted');
         }
-
       } else {
+        // create a new creative in Studio
         creativeId = await createNewCreative(creativeName, accountId, advertiserId, campaignId);
         console.log(`Creative ${creativeName} created!`);
       }
 
+      // upload assets from local folder
       await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId);
-      await setBackupImage(creativeId, backupImage, advertiserId)
+
+      if(backupImage){
+        // find backup image and select
+        await setBackupImage(creativeId, backupImage, advertiserId)
+      }
     }
     console.log('Done')
   } catch (err) {
