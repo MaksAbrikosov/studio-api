@@ -59,7 +59,7 @@ async function start() {
         console.log(`Creative ${creativeName} has already exist! Updating...!`)
 
         //TODO - fix var
-        var {assetsArray, backupImage} = getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId);
+        var {assetsArray, backupImage} = await getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId);
 
         if(assetsArray && assetsArray.length > 0){
           await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId);
