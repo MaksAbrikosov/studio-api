@@ -36,8 +36,6 @@ const config = require("../config");
       return conf;
     })
     .catch((err) => console.log(err));
-
-
 }
 
 module.exports = getUrl;

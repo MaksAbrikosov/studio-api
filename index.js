@@ -62,7 +62,6 @@ async function start() {
         var {assetsArray, backupImage} = getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId);
 
         if(assetsArray && assetsArray.length > 0){
-          console.log('assetsArray', assetsArray);
           await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId);
           console.log('Assets deleted');
         }
