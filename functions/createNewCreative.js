@@ -3,7 +3,6 @@ const config = require("../config");
 
 async function createNewCreative(creativeName, accountId, advertiserId, campaignId) {
 
-    let creativeId = '';
     const creativeSize = creativeName.split("_")[1];
     const creativeWidth = creativeSize.split('x')[0];
     const creativeHeight = creativeSize.split('x')[1];
@@ -33,7 +32,7 @@ async function createNewCreative(creativeName, accountId, advertiserId, campaign
         arguments: arguments.map(JSON.stringify)
     }
 
-    await axios({
+    return await axios({
         method: 'post',
         url: "https://www.google.com/doubleclick/studio/service",
         headers: {
@@ -49,10 +48,10 @@ async function createNewCreative(creativeName, accountId, advertiserId, campaign
         referrer: "https://www.google.com/doubleclick/studio/",
         mode: "cors"
     })
-        .then(response => creativeId =  response.data.id)
+        .then(response => {
+            return response.data.id
+        })
         .catch(err => console.error(err));
-
-    return creativeId
 }
 
 module.exports = createNewCreative;
