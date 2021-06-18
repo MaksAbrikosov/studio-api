@@ -2,7 +2,6 @@ const axios = require("axios");
 const config = require("../config");
 
 async function createNewCreative(creativeName, accountId, advertiserId, campaignId) {
-
     const creativeSize = creativeName.split("_")[1];
     const creativeWidth = creativeSize.split('x')[0];
     const creativeHeight = creativeSize.split('x')[1];
