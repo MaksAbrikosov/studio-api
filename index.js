@@ -78,6 +78,7 @@ async function start() {
       if(backupImage){
         // set backup image and select
         await setBackupImage(creativeId, backupImage, advertiserId)
+        console.log('Backup Image is marked')
       }
     }
     console.log('Done')
