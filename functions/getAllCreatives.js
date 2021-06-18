@@ -25,8 +25,8 @@ async function getAllCreatives(){
         "accept": "application/json, text/plain, */*",
         "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
         "content-type": "text/plain",
-        "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEI+MfKAQi6/coBCKmdywEIoKDLAQisoMsBCN3yywEIp/PLAQ==",
-        "x-xsrf-token": "AMUEn61PkgcYkUWu292_EJfTCtwQkt3VPw:1622560921719",
+          // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
+          "x-xsrf-token": "AMUEn62zXQ0oV5WkAROO970szyyRABWyFw:1623938273924",
         "cookie": config.Secure3PSID
       },
       referrerPolicy: "strict-origin-when-cross-origin",

@@ -2,7 +2,6 @@ const config = require('../config')
 const axios = require('axios')
 
 async function getAllCampaigns(){
-    let data = {}
     const arguments = [
       {
         "pageNumber":1,
@@ -18,30 +17,28 @@ async function getAllCampaigns(){
       arguments: arguments.map(JSON.stringify)
     }
   
-    await axios({
+    return await axios({
       method: 'post',
       url: "https://www.google.com/doubleclick/studio/service",
       headers: {
         "accept": "application/json, text/plain, */*",
         "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
         "content-type": "text/plain",
-        "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEI+MfKAQi6/coBCKmdywEIoKDLAQisoMsBCN3yywEIp/PLAQ==",
-        "x-xsrf-token": "AMUEn61PkgcYkUWu292_EJfTCtwQkt3VPw:1622560921719",
+        // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
+        "x-xsrf-token": "AMUEn62zXQ0oV5WkAROO970szyyRABWyFw:1623938273924",
         "cookie": config.Secure3PSID
       },
       referrerPolicy: "strict-origin-when-cross-origin",
       data: JSON.stringify(payload),
       referrer: "https://www.google.com/doubleclick/studio/",
-      method: "POST",
       mode: "cors"
     })
-    .then(body => data = {...body.data})
+    .then(body => {
+        return {...body.data}
+    })
     .catch(err => {
       console.error(err);
     });
-
-    return data
-  
   }
 
   module.exports = getAllCampaigns

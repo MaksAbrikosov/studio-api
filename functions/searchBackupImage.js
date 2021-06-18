@@ -1,7 +1,7 @@
 const axios = require("axios");
 const config = require("../config");
 
-function getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId){
+function searchBackupImage(creativeId, advertiserId, ownerId, entityId){
 
     const arguments = [
         {
@@ -26,7 +26,7 @@ function getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId){
         arguments: arguments.map(JSON.stringify)
     }
 
-   return axios({
+    return axios({
         method: 'post',
         url: "https://www.google.com/doubleclick/studio/service",
         headers: {
@@ -38,7 +38,7 @@ function getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId){
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
-            "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
+            // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
             "x-xsrf-token": "AMUEn62zXQ0oV5WkAROO970szyyRABWyFw:1623938273924",
             "cookie": `${config.Secure3PSID} ${config.SID}`,
         },
@@ -48,9 +48,9 @@ function getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId){
         mode: "cors",
     })
         .then(response => {
-            return [...response.data.assets.map(item => item.assetRef)]
+            return response.data.assets.find(item => item.originalFilename.match(/backup/)).originalFilename
         })
         .catch(err => console.error(err.response));
 }
 
-module.exports = getAssetsFromCreative;
+module.exports = searchBackupImage;
