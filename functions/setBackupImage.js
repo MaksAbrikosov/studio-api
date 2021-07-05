@@ -1,7 +1,7 @@
 const axios = require("axios");
 const config = require("../config");
 
-function setBackupImage(creativeId, backupImage, advertiserId){
+function setBackupImage(creativeId, backupImage, advertiserId, xsrfToken){
 
     const arguments = [`${advertiserId}`, `${creativeId}`, `${backupImage}`]
 
@@ -19,7 +19,7 @@ function setBackupImage(creativeId, backupImage, advertiserId){
             "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
             "content-type": "text/plain",
             // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCN3yywE=",
-            "x-xsrf-token": "AMUEn62zXQ0oV5WkAROO970szyyRABWyFw:1623938273924",
+            "x-xsrf-token": xsrfToken,
             "cookie": `${config.Secure3PSID} ${config.SID}`
         },
         referrerPolicy: "strict-origin-when-cross-origin",

@@ -1,7 +1,7 @@
 const axios = require("axios");
 const config = require("../config");
 
-async function removeAssets(assets, creativeId, advertiserId, ownerId, entityId){
+async function removeAssets(assets, creativeId, advertiserId, ownerId, entityId, xsrfToken){
 
     const arguments = [
         {
@@ -39,8 +39,8 @@ async function removeAssets(assets, creativeId, advertiserId, ownerId, entityId)
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
-            "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
-            "x-xsrf-token": "AMUEn60pHm58xh8g8DNwq2sRfmJtCfkJYA:1623245986563",
+            // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
+            "x-xsrf-token": xsrfToken,
             "cookie": `${config.Secure3PSID} ${config.SID}`,
         },
         referrer: "https://www.google.com/doubleclick/studio/",

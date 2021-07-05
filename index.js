@@ -3,6 +3,7 @@ const fs = require("fs");
 const { readdir } = require( "fs/promises");
 const FormData = require("form-data");
 const config = require("./config.js");
+const getXsrfToken = require("./functions/getXsrfToken");
 
 const getAllAdvertisers = require("./functions/getAllAdvertisers");
 const getAllCampaigns = require("./functions/getAllCampaigns");
@@ -22,8 +23,10 @@ let entityId;
 
 async function start() {
 
-  const campaigns = await getAllCampaigns();
-  const creatives = await getAllCreatives();
+  const xsrfToken = await getXsrfToken()
+
+  const campaigns = await getAllCampaigns(xsrfToken);
+  const creatives = await getAllCreatives(xsrfToken);
   const selectCampaign = campaigns.records.find(
       (campaign) => campaign.name === config.CAMPAIGN_NAME
   );
@@ -59,25 +62,25 @@ async function start() {
 
         console.log(`Creative ${creativeName} has already exist! Updating...!`)
 
-        const  assetsArray = await getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId);
+        const  assetsArray = await getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId, xsrfToken);
 
         if(assetsArray && assetsArray.length > 0){
-          await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId);
+          await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId, xsrfToken);
           console.log('Assets deleted');
         }
       } else {
         // create a new creative in Studio
-        creativeId = await createNewCreative(creativeName, accountId, advertiserId, campaignId);
+        creativeId = await createNewCreative(creativeName, accountId, advertiserId, campaignId, xsrfToken);
         console.log(`Creative ${creativeName} created!`);
       }
 
       // upload assets from local folder
       await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId);
-      const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId);
+      const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
 
       if(backupImage){
         // set backup image and select
-        await setBackupImage(creativeId, backupImage, advertiserId)
+        await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
         console.log('Backup Image is marked')
       }
     }
