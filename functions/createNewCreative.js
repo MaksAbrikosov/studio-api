@@ -1,7 +1,7 @@
 const axios = require("axios");
 const config = require("../config");
 
-async function createNewCreative(creativeName, accountId, advertiserId, campaignId) {
+async function createNewCreative(creativeName, accountId, advertiserId, campaignId, xsrfToken) {
     const creativeSize = creativeName.split("_")[1];
     const creativeWidth = creativeSize.split('x')[0];
     const creativeHeight = creativeSize.split('x')[1];
@@ -39,7 +39,7 @@ async function createNewCreative(creativeName, accountId, advertiserId, campaign
             "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
             "content-type": "text/plain",
             // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCN3yywE=",
-            "x-xsrf-token": "AMUEn62zXQ0oV5WkAROO970szyyRABWyFw:1623938273924",
+            "x-xsrf-token": xsrfToken,
             "cookie": `${config.Secure3PSID} ${config.SID}`
         },
         referrerPolicy: "strict-origin-when-cross-origin",
