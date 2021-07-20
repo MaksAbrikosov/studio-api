@@ -1,93 +1,25 @@
-const path = require("path");
-const fs = require("fs");
-const { readdir } = require( "fs/promises");
-const FormData = require("form-data");
-const config = require("./config.js");
-const getXsrfToken = require("./functions/getXsrfToken");
+const express = require('express')
+const bodyParser = require('body-parser')
+const exphbs = require('express-handlebars')
+const creativeRoutes = require('./routes/creative')
 
-const getAllAdvertisers = require("./functions/getAllAdvertisers");
-const getAllCampaigns = require("./functions/getAllCampaigns");
-const getAllCreatives = require("./functions/getAllCreatives");
-const createNewCreative = require("./functions/createNewCreative");
-const readFilesFromFolder = require("./functions/readFilesFromFolder");
-const removeAssets = require("./functions/removeAssets");
-const getAssetsFromCreative = require("./functions/getAssetsFromCreative");
-const searchBackupImage = require("./functions/searchBackupImage");
-const setBackupImage = require("./functions/setBackupImage");
+const PORT = 5000
+const app = express()
 
-let accountId;
-let advertiserId;
-let ownerId;
-let campaignId;
-let entityId;
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-async function start() {
+const hbs = exphbs.create({
+  defaultLayout: 'main',
+  extname: 'hbs'
+})
 
-  const xsrfToken = await getXsrfToken()
+app.engine('hbs', hbs.engine)
+app.set('view engine', 'hbs')
+app.set('views', 'views')
 
-  const campaigns = await getAllCampaigns(xsrfToken);
-  const creatives = await getAllCreatives(xsrfToken);
-  const selectCampaign = campaigns.records.find(
-      (campaign) => campaign.name === config.CAMPAIGN_NAME
-  );
+app.use('/', creativeRoutes)
 
-  if(!selectCampaign){
-    console.log('Campaign not exist')
-    return;
-  }
-
-  accountId = selectCampaign.account.id;
-  advertiserId = selectCampaign.advertiser.id;
-  ownerId = selectCampaign.entityRef.entityKey.ownerId;
-  campaignId = selectCampaign.entityRef.entityKey.entityId;
-
-  //read creative name from creative folder
-  const directoryPath = path.join(__dirname, "creatives");
-
-  try {
-    // read creatives folder
-    const folders = await readdir(directoryPath);
-    for (const creativeName of folders)
-    {
-      let filePath = path.join(directoryPath, creativeName);
-      const form = new FormData();
-      form.append("folder", fs.createReadStream(filePath));
-      const creative = creatives.records.find((item) => item.name === creativeName);
-
-      let creativeId;
-
-      if (creative) {
-        creativeId = creative.id;
-        entityId = creative.entityRef.entityKey.entityId;
-
-        console.log(`Creative ${creativeName} has already exist! Updating...!`)
-
-        const  assetsArray = await getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId, xsrfToken);
-
-        if(assetsArray && assetsArray.length > 0){
-          await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId, xsrfToken);
-          console.log('Assets deleted');
-        }
-      } else {
-        // create a new creative in Studio
-        creativeId = await createNewCreative(creativeName, accountId, advertiserId, campaignId, xsrfToken);
-        console.log(`Creative ${creativeName} created!`);
-      }
-
-      // upload assets from local folder
-      await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId);
-      const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
-
-      if(backupImage){
-        // set backup image and select
-        await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
-        console.log('Backup Image is marked')
-      }
-    }
-    console.log('Done')
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-start();
+app.listen(PORT, ()=> {
+    console.log(`Server has been started on port ${PORT}...`)
+})
