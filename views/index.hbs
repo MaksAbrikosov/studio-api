@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+    <title>Uploader</title>
+</head>
+<body>
+    <div class="container col-8 offset-2 mt-4 mb-4">
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none">
+            <div class="alertMsg"></div>
+        </div>
+
+        <form class="needs-validation" novalidate>
+
+            <div class="card border-secondary mb-3" >
+                <div class="card-header">Configuration</div>
+                <div class="card-body text-secondary">
+                    <p class="card-text">
+<!--                        <input type="text" class="creativeName form-control" name="campaignName" required>-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="campaignName">Campaign Name</label>-->
+<!--                            <input type="text" class="creativeName form-control" id="campaignName" name="campaignName" required>-->
+<!--                        </div>-->
+                        <div class="form-group">
+                            <label for="creativeUrl">Campaign Url</label>
+                            <input type="text" class="creativeUrl form-control" id="creativeUrl" name="creativeUrl" required>
+                        </div>
+                    </p>
+                </div>
+            </div>
+
+            {{#each creatives}}
+                <div class="card text-dark bg-light mb-3 cardIn"  id="{{ @index }}">
+                    <div class="card-header">
+                        <div class="mb-3 mt-2">
+                            <label for="" class="form-label">Creative Name</label>
+                            <input type="text" class="creativeName form-control" name="creatives" value="{{@key}}">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>Sizes</p>
+                        {{#each this}}
+                            <div class="form-check">
+                                <input class="form-check-input me-1" name="{{@index}}" type="checkbox" value="{{ this }}"  data-id="el{{@index}}" />
+                                <label for="check">{{@../key}}_{{ this }}</label>
+                            </div>
+                        {{/each}}
+                    </div>
+                </div>
+            {{/each}}
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-primary submitBtn" id="submit" type="submit">Submit</button>
+                <button class="btn btn-primary loadingBtn" type="button" disabled style="display: none">
+                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                    Loading...
+                </button>
+            </div>
+        </form>
+    </div>
+<script>
+    // const result = new FormData()
+
+    const creatives = {}
+
+    document.getElementById('submit').onclick = function(e) {
+        e.preventDefault();
+
+        // const campaignName = document.getElementsByName('campaignName')[0].value
+        const creativeUrlValue = document.getElementsByName('creativeUrl')[0].value
+
+        if(!creativeUrlValue.length){
+            showAlert(' <strong>Campaign URL is empty!</strong> Please enter URL ')
+            return;
+        }
+
+        // const campaignId = creativeUrlValue.slice(creativeUrlValue.indexOf('campaignId='), creativeUrlValue.indexOf('&')).split("=")[1]
+        const parseUrl = creativeUrlValue.split(/\=|&/)
+        const campaignId = parseUrl[1]
+        const advertiserId = parseUrl[3]
+        const ownerId = parseUrl[5]
+
+        if(!campaignId && !advertiserId && !ownerId){
+            showAlert(' <strong>Error!</strong> ')
+            return;
+        }
+
+
+        function showAlert(msg){
+            document.getElementsByClassName("alert")[0].style.display = "block";
+            document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
+        }
+
+        // if(!campaignName.length){
+        //     showAlert(' <strong>Campaign name is empty!</strong> Please enter сampaign name ')
+        //     return;
+        // }
+
+        document.getElementsByClassName("alert")[0].style.display = "none";
+        document.getElementsByClassName("submitBtn")[0].style.display = "none";
+        document.getElementsByClassName("loadingBtn")[0].style.display = "block";
+
+        document.querySelectorAll('.cardIn').forEach(node=> {
+            const newName = node.querySelector('input[type=text]').value
+            const originName = node.querySelector('input[type=text]').getAttribute('value')
+            const checked = [...node.querySelectorAll('input[type=checkbox]:checked')].map(e=> e.value)
+            // creatives[name] = checked
+            creatives[originName] = {
+                newName,
+                data:checked
+            }
+        })
+
+        const result = {
+            // campaignName,
+            campaignId,
+            advertiserId,
+            ownerId,
+            creatives: {...creatives}
+        }
+
+        fetch("/complete", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(result)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            showAlert(data.message)
+            document.getElementsByClassName("submitBtn")[0].style.display = "block";
+            document.getElementsByClassName("loadingBtn")[0].style.display = "none";
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+</script>
+</body>
+</html>
