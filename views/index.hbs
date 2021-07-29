@@ -31,7 +31,13 @@
                             <label for="creativeUrl">Campaign Url</label>
                             <input type="text" class="creativeUrl form-control" id="creativeUrl" name="creativeUrl" required>
                         </div>
+
                     </p>
+                    <button class="btn btn-primary checkCampaignIdBtn" id="checkCampaignIdBtn" >Check Campaign</button>
+                    <button class="btn btn-primary loadingCheckCampaign" type="button" disabled style="display: none">
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                    </button>
                 </div>
             </div>
 
@@ -68,11 +74,14 @@
 
     const creatives = {}
 
-    document.getElementById('submit').onclick = function(e) {
-        e.preventDefault();
+    function showAlert(msg){
+        document.getElementsByClassName("alert")[0].style.display = "block";
+        document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
+    }
 
-        // const campaignName = document.getElementsByName('campaignName')[0].value
+    function parseCampaignUrl() {
         const creativeUrlValue = document.getElementsByName('creativeUrl')[0].value
+
 
         if(!creativeUrlValue.length){
             showAlert(' <strong>Campaign URL is empty!</strong> Please enter URL ')
@@ -85,15 +94,58 @@
         const advertiserId = parseUrl[3]
         const ownerId = parseUrl[5]
 
+        return {
+            campaignId,
+            advertiserId,
+            ownerId
+        }
+    }
+
+    // CHECK CAMPAIGN
+
+    document.getElementById('checkCampaignIdBtn').onclick = function (e){
+        e.preventDefault();
+
+        document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "none";
+        document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "block";
+
+        const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
+
+        const result = {
+            campaignId,
+            advertiserId,
+            ownerId
+        }
+
+        fetch("/check", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(result)
+        })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    showAlert(data.message)
+                    document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
+                    document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
+                }).catch(err => {
+            console.log(err)
+        })
+    }
+
+
+    document.getElementById('submit').onclick = function(e) {
+        e.preventDefault();
+
+        // const campaignName = document.getElementsByName('campaignName')[0].value
+
+        const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
+
         if(!campaignId && !advertiserId && !ownerId){
             showAlert(' <strong>Error!</strong> ')
             return;
-        }
-
-
-        function showAlert(msg){
-            document.getElementsByClassName("alert")[0].style.display = "block";
-            document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
         }
 
         // if(!campaignName.length){

@@ -7,7 +7,7 @@ const getXsrfToken = require("./getXsrfToken");
 
 
 // const getAllAdvertisers = require("./getAllAdvertisers");
-// const getAllCampaigns = require("./getAllCampaigns");
+const getAllCampaigns = require("./getAllCampaigns");
 const getAllCreatives = require("./getAllCreatives");
 const createNewCreative = require("./createNewCreative");
 const readFilesFromFolder = require("./readFilesFromFolder");
@@ -99,15 +99,16 @@ async function start(campaignId, advertiserId, ownerId, data) {
                 console.log(`Creative ${creativeName} created!`);
               }
 
+              // await getAllCampaigns(xsrfToken)
               // upload assets from local folder
               await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size);
 
-              const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
-              if(backupImage){
-                // set backup image and select
-                await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
-                console.log('Backup Image is marked')
-              }
+              // const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
+              // if(backupImage){
+              //   // set backup image and select
+              //   await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
+              //   console.log('Backup Image is marked')
+              // }
           }
       }
       console.log('Done')

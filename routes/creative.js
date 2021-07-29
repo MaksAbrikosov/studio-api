@@ -2,13 +2,15 @@ const {Router} = require('express')
 const router = Router()
 const readCreativeDirectory = require('../functions/readCreativeDirectory')
 const start = require('../functions/start')
+const getCampaign = require('../functions/getCampaign')
+const getXsrfToken = require("../functions/getXsrfToken");
 
 router.get('/', async (req, res) => {
 
     const data = await readCreativeDirectory()
 
     res.render('index', {
-        title: 'testTitle',
+        // title: 'testTitle',
         creatives: data,
     })
 })
@@ -27,5 +29,21 @@ router.post('/complete',  async (req, res) => {
     await start( campaignId, advertiserId, ownerId, filteredData)
     res.status(200).json({message: "Creatives uploaded successfully!"})
 })
+
+router.post('/check',  async (req, res) => {
+    const { campaignId, advertiserId, ownerId } = req.body
+    const xsrfToken = await getXsrfToken()
+
+    const campaign = await getCampaign(campaignId, advertiserId, ownerId, ownerId, xsrfToken)
+
+    if(campaign){
+        res.status(200).json({message: "Campaign exist"})
+    } else {
+        res.status(400).json({message: "Campaign not found"})
+    }
+
+
+})
+
 
 module.exports = router
