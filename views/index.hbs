@@ -116,7 +116,10 @@
     function updateValue(node, value){
         node.querySelectorAll('.lab').forEach(
                 (element) => {
-                    element.innerText = `${value}_${element.innerHTML.split('_')[1]}`
+                    const len  =element.innerHTML.split('_')
+                    // console.log(len.length)
+                    // console.log(element.innerHTML.split('_')[len.length-1])
+                    element.innerText = `${value}_${element.innerHTML.split('_')[len.length-1]}`
                 }
         )
     }
