@@ -33,7 +33,6 @@ function getAllAdvertisers(){
       referrerPolicy: "strict-origin-when-cross-origin",
       data: JSON.stringify(payload),
       referrer: "https://www.google.com/doubleclick/studio/",
-      method: "POST",
       mode: "cors"
     })
     .then(body => console.log(body.data))

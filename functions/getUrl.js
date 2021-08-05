@@ -32,8 +32,8 @@ const config = require("../config");
     .then((data) => {
       let uploadUrl = data.headers["x-goog-upload-url"];
       let setCookie = data.headers["set-cookie"][0].split(";")[0];
-      const conf = {uploadUrl, setCookie}
-      return conf;
+      // const conf = {uploadUrl, setCookie}
+      return {uploadUrl, setCookie};
     })
     .catch((err) => console.log(err));
 }

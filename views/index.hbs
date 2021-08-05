@@ -46,7 +46,7 @@
                     <div class="card-header">
                         <div class="mb-3 mt-2">
                             <label for="" class="form-label">Creative Name</label>
-                            <input type="text" class="creativeName form-control" name="creatives" value="{{@key}}">
+                            <input type="text" class="creativeName form-control" name="creatives" value="{{@key}}" >
                         </div>
                     </div>
                     <div class="card-body">
@@ -54,7 +54,7 @@
                         {{#each this}}
                             <div class="form-check">
                                 <input class="form-check-input me-1" name="{{@index}}" type="checkbox" value="{{ this }}"  data-id="el{{@index}}" />
-                                <label for="check">{{@../key}}_{{ this }}</label>
+                                <label for="check" class="lab">{{@../key}}_{{ this }}</label>
                             </div>
                         {{/each}}
                     </div>
@@ -70,9 +70,6 @@
         </form>
     </div>
 <script>
-    // const result = new FormData()
-
-    const creatives = {}
 
     function showAlert(msg){
         document.getElementsByClassName("alert")[0].style.display = "block";
@@ -85,6 +82,8 @@
 
         if(!creativeUrlValue.length){
             showAlert(' <strong>Campaign URL is empty!</strong> Please enter URL ')
+            document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
+            document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
             return;
         }
 
@@ -94,14 +93,47 @@
         const advertiserId = parseUrl[3]
         const ownerId = parseUrl[5]
 
+        console.log(parseUrl)
+
         return {
             campaignId,
             advertiserId,
             ownerId
         }
     }
+    // TODO -  debounce or throttle
+    function debounce(fn, ms = 150) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                fn(...args)
+                // fn.apply(this, args)
+            }, ms)
+        }
+    }
 
-    // CHECK CAMPAIGN
+    function updateValue(node, value){
+        node.querySelectorAll('.lab').forEach(
+                (element) => {
+                    element.innerText = `${value}_${element.innerHTML.split('_')[1]}`
+                }
+        )
+    }
+
+    const debouncedUpdateValue = debounce(updateValue)
+
+    // Changes checkbox labels when changed creative name
+    document.querySelectorAll('.cardIn').forEach((node, i) => {
+        node.querySelector('.creativeName').addEventListener("input", function() {
+            debouncedUpdateValue(node, this.value)
+        })
+    })
+
+
+    const creatives = {}
+
+    // CHECK IF CAMPAIGN EXIST
 
     document.getElementById('checkCampaignIdBtn').onclick = function (e){
         e.preventDefault();
@@ -110,6 +142,11 @@
         document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "block";
 
         const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
+
+        if(!campaignId && !advertiserId && !ownerId){
+            showAlert(' <strong>Error!</strong> ')
+            return;
+        }
 
         const result = {
             campaignId,
@@ -127,7 +164,8 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
-                    showAlert(data.message)
+                    const {accountName, advertiserName, campaignName} = data;
+                    showAlert(`Path in Studio : ${accountName} | ${advertiserName} | ${campaignName}`)
                     document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
                     document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
                 }).catch(err => {

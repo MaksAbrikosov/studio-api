@@ -36,8 +36,15 @@ router.post('/check',  async (req, res) => {
 
     const campaign = await getCampaign(campaignId, advertiserId, ownerId, ownerId, xsrfToken)
 
+    // console.log(campaign.account.name, campaign.advertiser.name, campaign.name)
+
     if(campaign){
-        res.status(200).json({message: "Campaign exist"})
+        res.status(200).json({
+            // message: "Campaign exist"
+            accountName: campaign.account.name,
+            advertiserName: campaign.advertiser.name,
+            campaignName: campaign.name
+        })
     } else {
         res.status(400).json({message: "Campaign not found"})
     }
