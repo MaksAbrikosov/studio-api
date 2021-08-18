@@ -72,12 +72,13 @@ async function start(campaignId, advertiserId, ownerId, data) {
       for(const name of Object.keys(data)){
           for(const size of Object.values(data[name].data)){
 
-              const creativeName = `${data[name].newName}_${size}`
+              // const creativeName = `${data[name].newName}_${size}`
+              const creativeName = data[name].newName;
 
-              let filePath = path.join(directoryPath, creativeName);
+              let filePath = path.join(directoryPath, creativeName+size);
               const form = new FormData();
               form.append("folder", fs.createReadStream(filePath));
-              const creative = creatives.records.find((item) => item.name === creativeName);
+              const creative = creatives.records.find((item) => item.name === creativeName+size);
 
 
               let creativeId;
@@ -85,7 +86,7 @@ async function start(campaignId, advertiserId, ownerId, data) {
                 creativeId = creative.id;
                 entityId = creative.entityRef.entityKey.entityId;
 
-                console.log(`Creative ${creativeName} has already exist! Updating...!`)
+                console.log(`Creative ${creativeName}${size} has already exist! Updating...!`)
 
                 const assetsArray = await getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId, xsrfToken);
 
@@ -95,8 +96,8 @@ async function start(campaignId, advertiserId, ownerId, data) {
                 }
               } else {
                 // create a new creative in Studio
-                creativeId = await createNewCreative(creativeName, accountId, advertiserId, campaignId, xsrfToken);
-                console.log(`Creative ${creativeName} created!`);
+                creativeId = await createNewCreative(creativeName, size, accountId, advertiserId, campaignId, xsrfToken);
+                console.log(`Creative ${creativeName}${size} created!`);
               }
 
               // await getAllCampaigns(xsrfToken)
