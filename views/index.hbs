@@ -71,6 +71,10 @@
     </div>
 <script>
 
+    let changedName = false
+    const arrSizes = []
+    const creatives = {}
+
     function showAlert(msg){
         document.getElementsByClassName("alert")[0].style.display = "block";
         document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
@@ -101,6 +105,10 @@
             ownerId
         }
     }
+
+
+    // Changes checkbox labels when changed creative name
+
     // TODO -  debounce or throttle
     function debounce(fn, ms = 150) {
         let timer;
@@ -115,26 +123,24 @@
 
     function updateValue(node, value){
         node.querySelectorAll('.lab').forEach(
-                (element) => {
-                    const len  =element.innerHTML.split('_')
-                    // console.log(len.length)
-                    // console.log(element.innerHTML.split('_')[len.length-1])
-                    element.innerText = `${value}_${element.innerHTML.split('_')[len.length-1]}`
+                (element, i) => {
+                    if(!changedName){
+                        const sizes = element.innerHTML.split('_')[1]
+                        arrSizes.push(sizes)
+                    }
+                    element.innerText = `${value}${arrSizes[i]}`
                 }
         )
+        changedName = true
     }
 
     const debouncedUpdateValue = debounce(updateValue)
 
-    // Changes checkbox labels when changed creative name
     document.querySelectorAll('.cardIn').forEach((node, i) => {
         node.querySelector('.creativeName').addEventListener("input", function() {
             debouncedUpdateValue(node, this.value)
         })
     })
-
-
-    const creatives = {}
 
     // CHECK IF CAMPAIGN EXIST
 
@@ -176,6 +182,7 @@
         })
     }
 
+    // SUBMIT
 
     document.getElementById('submit').onclick = function(e) {
         e.preventDefault();
@@ -198,8 +205,14 @@
         document.getElementsByClassName("submitBtn")[0].style.display = "none";
         document.getElementsByClassName("loadingBtn")[0].style.display = "block";
 
+        let newName
         document.querySelectorAll('.cardIn').forEach(node=> {
-            const newName = node.querySelector('input[type=text]').value
+            if(changedName){
+                 newName = node.querySelector('input[type=text]').value
+            } else {
+                 newName = node.querySelector('input[type=text]').value+"_"
+            }
+
             const originName = node.querySelector('input[type=text]').getAttribute('value')
             const checked = [...node.querySelectorAll('input[type=checkbox]:checked')].map(e=> e.value)
             // creatives[name] = checked

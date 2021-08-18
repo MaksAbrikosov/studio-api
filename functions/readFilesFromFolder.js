@@ -5,7 +5,7 @@ const { readdir } = require( "fs/promises");
 const getUrl = require("./getUrl");
 const uploadFile = require("./uploadFile");
 
-async function readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size){
+async function  readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size){
 
     // const name = creativeName.split('_')[0]
     // const size = creativeName.split('_')[1]

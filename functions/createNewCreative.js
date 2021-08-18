@@ -1,15 +1,16 @@
 const axios = require("axios");
 const config = require("../config");
 
-async function createNewCreative(creativeName, accountId, advertiserId, campaignId, xsrfToken) {
+async function createNewCreative(creativeName, size, accountId, advertiserId, campaignId, xsrfToken) {
 
-    const nameArrayLength = creativeName.split("_").length
+    // const nameArrayLength = creativeName.split("_").length
+    //
+    // const creativeSize = creativeName.split("_")[nameArrayLength-1];
+    // const creativeWidth = creativeSize.split('x')[0];
+    // const creativeHeight = creativeSize.split('x')[1];
 
-    const creativeSize = creativeName.split("_")[nameArrayLength-1];
-    const creativeWidth = creativeSize.split('x')[0];
-    const creativeHeight = creativeSize.split('x')[1];
-
-    console.log(creativeSize)
+    const creativeWidth = size.split('x')[0];
+    const creativeHeight = size.split('x')[1];
 
     const arguments = [
         {
@@ -27,7 +28,7 @@ async function createNewCreative(creativeName, accountId, advertiserId, campaign
                 "width": creativeWidth,
                 "height":creativeHeight
             },
-            "name": creativeName
+            "name": creativeName+size
         }
     ];
     const payload = {
