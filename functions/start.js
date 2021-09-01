@@ -27,7 +27,7 @@ let accountId;
 let entityId;
 
 
-async function start(campaignId, advertiserId, ownerId, data) {
+async function start(campaignId, advertiserId, ownerId, creativePath, data) {
 
     // if(!campaignName.length){
     //     console.log('Input Campaign Name')
@@ -58,7 +58,8 @@ async function start(campaignId, advertiserId, ownerId, data) {
   // campaignId = selectCampaign.entityRef.entityKey.entityId;
 
   //read creative name from creative folder
-  const directoryPath = path.join(__dirname, "/../creatives");
+  // const directoryPath = path.join(__dirname, "/../creatives");
+  //   const directoryPath = creativePath
 
   try {
     // read creatives folder
@@ -75,7 +76,7 @@ async function start(campaignId, advertiserId, ownerId, data) {
               // const creativeName = `${data[name].newName}_${size}`
               const creativeName = data[name].newName;
 
-              let filePath = path.join(directoryPath, creativeName+size);
+              let filePath = path.join(creativePath, creativeName+size);
               const form = new FormData();
               form.append("folder", fs.createReadStream(filePath));
               const creative = creatives.records.find((item) => item.name === creativeName+size);
@@ -102,7 +103,7 @@ async function start(campaignId, advertiserId, ownerId, data) {
 
               // await getAllCampaigns(xsrfToken)
               // upload assets from local folder
-              await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size);
+              await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size, creativePath);
 
               // const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
               // if(backupImage){

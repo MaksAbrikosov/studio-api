@@ -6,8 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-
+    <script   src="https://code.jquery.com/jquery-3.6.0.js"   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="   crossorigin="anonymous"></script>
     <title>Uploader</title>
+    <style>
+        .chooseLabel {
+
+        }
+    </style>
 </head>
 <body>
     <div class="container col-8 offset-2 mt-4 mb-4">
@@ -15,38 +20,45 @@
         <div class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none">
             <div class="alertMsg"></div>
         </div>
-
         <form class="needs-validation" novalidate>
 
-            <div class="card border-secondary mb-3" >
+            <div class="card border-secondary mb-3 " >
                 <div class="card-header">Configuration</div>
                 <div class="card-body text-secondary">
                     <p class="card-text">
-<!--                        <input type="text" class="creativeName form-control" name="campaignName" required>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="campaignName">Campaign Name</label>-->
-<!--                            <input type="text" class="creativeName form-control" id="campaignName" name="campaignName" required>-->
+
+                        <div class="form-group">
+                            <label for="path">Creative Folder Path</label>
+                            <input type="path" class="form-control col-md-8" id="path" placeholder="path" value={{ pathToFolder}}>
+                        </div>
+<!--                        <div class="form-group ">-->
+<!--                            <input type="file" id="flup" class="custom-file-input"  onchange="getFolder(event)" webkitdirectory mozdirectory msdirectory odirectory directory  hidden/>-->
+<!--                            <label class="chooseLabel btn btn-primary" for="flup">Choose Directory</label>-->
 <!--                        </div>-->
+
                         <div class="form-group">
                             <label for="creativeUrl">Campaign Url</label>
                             <input type="text" class="creativeUrl form-control" id="creativeUrl" name="creativeUrl" required>
                         </div>
 
+
+                        <button class="btn btn-primary checkCampaignIdBtn" id="checkCampaignIdBtn" >Check Campaign</button>
+                        <button class="btn btn-primary loadingCheckCampaign" type="button" disabled style="display: none">
+                            <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
                     </p>
-                    <button class="btn btn-primary checkCampaignIdBtn" id="checkCampaignIdBtn" >Check Campaign</button>
-                    <button class="btn btn-primary loadingCheckCampaign" type="button" disabled style="display: none">
-                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                        Loading...
-                    </button>
                 </div>
             </div>
 
+            <div class="card text-dark bg-light mb-3 formCard" id="testCon">
+
             {{#each creatives}}
-                <div class="card text-dark bg-light mb-3 cardIn"  id="{{ @index }}">
+                <div class="card text-dark bg-light mb-3 cardIn" >
                     <div class="card-header">
                         <div class="mb-3 mt-2">
                             <label for="" class="form-label">Creative Name</label>
-                            <input type="text" class="creativeName form-control" name="creatives" value="{{@key}}" >
+                            <input type="text" class="creativeName form-control"  id="card{{ @index }}" name="creatives" value="{{@key}}" >
                         </div>
                     </div>
                     <div class="card-body">
@@ -60,6 +72,7 @@
                     </div>
                 </div>
             {{/each}}
+            </div>
             <div class="d-grid gap-2 mt-3">
                 <button class="btn btn-primary submitBtn" id="submit" type="submit">Submit</button>
                 <button class="btn btn-primary loadingBtn" type="button" disabled style="display: none">
@@ -69,184 +82,301 @@
             </div>
         </form>
     </div>
-<script>
+    <script>
 
-    let changedName = false
-    const arrSizes = []
-    const creatives = {}
+        let cardObj = {}
+        let changedName = false
+        let creatives = {}
 
-    function showAlert(msg){
-        document.getElementsByClassName("alert")[0].style.display = "block";
-        document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
-    }
+       document.querySelectorAll('.cardIn input[type="text"]').forEach(el => {
+           Object.assign(cardObj, {[el.id] : null })
+        })
 
-    function parseCampaignUrl() {
-        const creativeUrlValue = document.getElementsByName('creativeUrl')[0].value
+        const template = (nameCreative, index, data) => {
+            const card = document.createElement("div")
+            card.setAttribute('class', `card text-dark bg-light mb-3 cardIn` )
+            card.setAttribute('id', index)
+
+            const cardHeader = document.createElement("div")
+            cardHeader.setAttribute('class', 'card-header')
+
+            const headerDiv = document.createElement("div")
+            headerDiv.setAttribute('class', 'mb-3 mt-2')
+
+            const inputLabel = document.createElement("label")
+            inputLabel.setAttribute('class', 'form-label')
+            inputLabel.innerHTML = "Creative Name"
 
 
-        if(!creativeUrlValue.length){
-            showAlert(' <strong>Campaign URL is empty!</strong> Please enter URL ')
-            document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
-            document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
-            return;
+            const cardBody = document.createElement("div")
+            cardBody.setAttribute('class', 'card-body')
+
+            const bodyText = document.createElement("p")
+            bodyText.innerHTML = "Sizes"
+
+            const text = document.createElement("p")
+            text.innerHTML = nameCreative
+
+
+            const input = document.createElement("input")
+            input.setAttribute('class', 'creativeName form-control')
+            input.setAttribute('name', 'creatives')
+            input.setAttribute('type', 'text')
+            input.setAttribute('value', nameCreative)
+            input.setAttribute('id', `card${index}`)
+
+            card.appendChild(cardHeader)
+            cardHeader.appendChild(headerDiv)
+            headerDiv.appendChild(input)
+
+            card.appendChild(cardBody)
+            cardBody.appendChild(bodyText)
+
+            data[nameCreative].forEach((name, index) => {
+
+                const formCheckClass = document.createElement("div")
+                formCheckClass.setAttribute('class', 'form-check')
+
+                const checkBox = document.createElement("input")
+                checkBox.setAttribute('class', 'form-check-input me-1')
+                checkBox.setAttribute('name', index)
+                checkBox.setAttribute('type', 'checkbox')
+                checkBox.setAttribute('value', name)
+                checkBox.setAttribute('data-id', `el${index}`)
+                checkBox.setAttribute('id', index)
+
+                const checkBoxLabel = document.createElement("label")
+                checkBoxLabel.setAttribute('for', index)
+                checkBoxLabel.setAttribute('class', 'lab')
+                checkBoxLabel.innerHTML = `${nameCreative}_${name}`
+
+                cardBody.appendChild(formCheckClass)
+                formCheckClass.appendChild(checkBox)
+                formCheckClass.appendChild(checkBoxLabel)
+            })
+
+            return card
         }
 
-        // const campaignId = creativeUrlValue.slice(creativeUrlValue.indexOf('campaignId='), creativeUrlValue.indexOf('&')).split("=")[1]
-        const parseUrl = creativeUrlValue.split(/\=|&/)
-        const campaignId = parseUrl[1]
-        const advertiserId = parseUrl[3]
-        const ownerId = parseUrl[5]
-
-        console.log(parseUrl)
-
-        return {
-            campaignId,
-            advertiserId,
-            ownerId
+        const display = (data) => {
+            Object.keys(data).forEach((name, index) => {
+                const newTemp = template(name, index, data)
+                document.getElementsByClassName('formCard')[0].appendChild(newTemp)
+                updateCreativeName()
+            })
         }
-    }
+
+        const creativePath = document.getElementById('path').addEventListener('input', (e) => {
+            creatives = {}
+            cardObj = {}
+            const localPath = e.target.value
+            fetch("/chooseDir", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({localPath})
+            })
+                    .then(response => response.json())
+                    .then(data => {
+                        let container = document.getElementById('testCon')
+                        while (container.firstChild) {
+                            container.removeChild(container.firstChild);
+                        }
+                        // updateCreativeName()
+                        display(data)
+                    })
+        })
 
 
-    // Changes checkbox labels when changed creative name
+///////////////////////////////////////////////////////////////////////////////////
 
-    // TODO -  debounce or throttle
-    function debounce(fn, ms = 150) {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer)
-            timer = setTimeout(() => {
-                fn(...args)
-                // fn.apply(this, args)
-            }, ms)
+        function showAlert(msg){
+            document.getElementsByClassName("alert")[0].style.display = "block";
+            document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
         }
-    }
 
-    function updateValue(node, value){
-        node.querySelectorAll('.lab').forEach(
+        function parseCampaignUrl() {
+            const creativeUrlValue = document.getElementsByName('creativeUrl')[0].value
+
+            if(!creativeUrlValue.length){
+                showAlert(' <strong>Campaign URL is empty!</strong> Please enter URL ')
+                document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
+                document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
+                return;
+            }
+
+            // const campaignId = creativeUrlValue.slice(creativeUrlValue.indexOf('campaignId='), creativeUrlValue.indexOf('&')).split("=")[1]
+            const parseUrl = creativeUrlValue.split(/\=|&/)
+            const campaignId = parseUrl[1]
+            const advertiserId = parseUrl[3]
+            const ownerId = parseUrl[5]
+
+            return {
+                campaignId,
+                advertiserId,
+                ownerId
+            }
+        }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+        // Changes checkbox labels when changed creative name
+
+        // TODO -  debounce or throttle
+        function debounce(fn, ms = 150) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer)
+                timer = setTimeout(() => {
+                    fn(...args)
+                    // fn.apply(this, args)
+                }, ms)
+            }
+        }
+
+        function updateValue(node, nameId, value){
+            let arrSizes = []
+
+            node.querySelectorAll('.lab').forEach(
                 (element, i) => {
-                    if(!changedName){
+                    if(!cardObj[nameId]){
                         const sizes = element.innerHTML.split('_')[1]
                         arrSizes.push(sizes)
                     }
-                    element.innerText = `${value}${arrSizes[i]}`
                 }
-        )
-        changedName = true
-    }
+            )
+            changedName = true
+            if(!cardObj[nameId]) {
+                cardObj[nameId] = arrSizes
+            }
+            node.querySelectorAll('.lab').forEach((el, i) => {
+                el.innerText = `${value}${cardObj[nameId][i]}`
+            })
 
-    const debouncedUpdateValue = debounce(updateValue)
-
-    document.querySelectorAll('.cardIn').forEach((node, i) => {
-        node.querySelector('.creativeName').addEventListener("input", function() {
-            debouncedUpdateValue(node, this.value)
-        })
-    })
-
-    // CHECK IF CAMPAIGN EXIST
-
-    document.getElementById('checkCampaignIdBtn').onclick = function (e){
-        e.preventDefault();
-
-        document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "none";
-        document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "block";
-
-        const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
-
-        if(!campaignId && !advertiserId && !ownerId){
-            showAlert(' <strong>Error!</strong> ')
-            return;
         }
 
-        const result = {
-            campaignId,
-            advertiserId,
-            ownerId
+        const debouncedUpdateValue = debounce(updateValue)
+
+        // document.querySelectorAll('.cardIn').forEach((node, i) => {
+        //     node.querySelector('.creativeName').addEventListener("input", function() {
+        //         debouncedUpdateValue(node, this.value)
+        //     })
+        // })
+
+        const updateCreativeName = () => {
+            document.querySelectorAll('.cardIn').forEach((node, i) => {
+                node.querySelector('.creativeName').addEventListener("input", function() {
+                    const nameId = node.getElementsByClassName('creativeName')[0].id
+                    debouncedUpdateValue(node, nameId, this.value)
+                })
+            })
         }
 
-        fetch("/check", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(result)
-        })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data)
-                    const {accountName, advertiserName, campaignName} = data;
-                    showAlert(`Path in Studio : ${accountName} | ${advertiserName} | ${campaignName}`)
-                    document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
-                    document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
-                }).catch(err => {
-            console.log(err)
-        })
-    }
+        updateCreativeName()
 
-    // SUBMIT
+        // CHECK IF CAMPAIGN EXIST
 
-    document.getElementById('submit').onclick = function(e) {
-        e.preventDefault();
+        document.getElementById('checkCampaignIdBtn').onclick = function (e){
+            e.preventDefault();
 
-        // const campaignName = document.getElementsByName('campaignName')[0].value
+            document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "none";
+            document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "block";
 
-        const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
+            const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
 
-        if(!campaignId && !advertiserId && !ownerId){
-            showAlert(' <strong>Error!</strong> ')
-            return;
-        }
-
-        // if(!campaignName.length){
-        //     showAlert(' <strong>Campaign name is empty!</strong> Please enter сampaign name ')
-        //     return;
-        // }
-
-        document.getElementsByClassName("alert")[0].style.display = "none";
-        document.getElementsByClassName("submitBtn")[0].style.display = "none";
-        document.getElementsByClassName("loadingBtn")[0].style.display = "block";
-
-        let newName
-        document.querySelectorAll('.cardIn').forEach(node=> {
-            if(changedName){
-                 newName = node.querySelector('input[type=text]').value
-            } else {
-                 newName = node.querySelector('input[type=text]').value+"_"
+            if(!campaignId && !advertiserId && !ownerId){
+                showAlert(' <strong>Error!</strong> ')
+                return;
             }
 
-            const originName = node.querySelector('input[type=text]').getAttribute('value')
-            const checked = [...node.querySelectorAll('input[type=checkbox]:checked')].map(e=> e.value)
-            // creatives[name] = checked
-            creatives[originName] = {
-                newName,
-                data:checked
+            const result = {
+                campaignId,
+                advertiserId,
+                ownerId
             }
-        })
 
-        const result = {
-            // campaignName,
-            campaignId,
-            advertiserId,
-            ownerId,
-            creatives: {...creatives}
+            fetch("/check", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(result)
+            })
+                    .then(response => response.json())
+                    .then(data => {
+                        const {accountName, advertiserName, campaignName} = data;
+                        showAlert(`Path in Studio : ${accountName} | ${advertiserName} | ${campaignName}`)
+                        document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
+                        document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
+                    }).catch(err => {
+                console.log(err)
+            })
         }
+    ////////////////////////////////////////////////////////////////////////////
+        // SUBMIT
 
-        fetch("/complete", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(result)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
-            showAlert(data.message)
-            document.getElementsByClassName("submitBtn")[0].style.display = "block";
-            document.getElementsByClassName("loadingBtn")[0].style.display = "none";
-        }).catch(err => {
-            console.log(err)
-        })
-    }
-</script>
+        document.getElementById('submit').onclick = function(e) {
+            e.preventDefault();
+
+            const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
+
+            if(!campaignId && !advertiserId && !ownerId){
+                showAlert(' <strong>Error!</strong> ')
+                return;
+            }
+
+            document.getElementsByClassName("alert")[0].style.display = "none";
+            document.getElementsByClassName("submitBtn")[0].style.display = "none";
+            document.getElementsByClassName("loadingBtn")[0].style.display = "block";
+
+            let newName;
+            document.querySelectorAll('.cardIn').forEach(node=> {
+                if(changedName){
+                     newName = node.querySelector('input[type=text]').value
+                } else {
+                     newName = node.querySelector('input[type=text]').value+"_"
+                }
+
+                const originName = node.querySelector('input[type=text]').getAttribute('value')
+                const checked = [...node.querySelectorAll('input[type=checkbox]:checked')].map(e=> e.value)
+                // creatives[name] = checked
+                creatives[originName] = {
+                    newName,
+                    data:checked
+                }
+            })
+
+            const creativePath = document.getElementById('path').value
+            if(!creativePath.length){
+                showAlert('<strong>Creative folder path is empty!</strong> Please enter URL ')
+                return;
+            }
+
+            const result = {
+                // campaignName,
+                campaignId,
+                advertiserId,
+                ownerId,
+                creativePath,
+                creatives: {...creatives}
+            }
+
+            fetch("/complete", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(result)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert(data.message)
+                document.getElementsByClassName("submitBtn")[0].style.display = "block";
+                document.getElementsByClassName("loadingBtn")[0].style.display = "none";
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+    </script>
 </body>
 </html>
