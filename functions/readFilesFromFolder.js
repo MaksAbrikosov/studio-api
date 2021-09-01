@@ -1,19 +1,24 @@
 const path = require("path");
 const fs = require("fs");
-const { readdir } = require( "fs/promises");
+// const { readdir } = require( "fs/promises");
 
 const getUrl = require("./getUrl");
 const uploadFile = require("./uploadFile");
 
 let archiver = require('archiver');
 
-async function  readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size){
+async function  readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size, creativePath){
 
     // create archive
     const zipName = size + ".zip";
-    const source = path.join(__dirname, `../creatives/${name}/${size}`);
-    const output = path.join(__dirname, `../creatives/${name}`, zipName);
-    const pathToZipFile = path.join(__dirname, `../creatives/${name}/${zipName}`)
+    // const source = path.join(__dirname, `../creatives/${name}/${size}`);
+    // const output = path.join(__dirname, `../creatives/${name}`, zipName);
+    // const pathToZipFile = path.join(__dirname, `../creatives/${name}/${zipName}`)
+
+    const source = path.join(creativePath, `${name}/${size}`);
+    const output = path.join(creativePath, `${name}`, zipName);
+    const pathToZipFile = path.join(creativePath, `${name}/${zipName}`)
+
 
 
     const archive = archiver('zip', { zlib: { level: 9 }});

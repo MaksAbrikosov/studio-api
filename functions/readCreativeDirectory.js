@@ -2,18 +2,18 @@ const path = require("path");
 const { readdir, unlink } = require( "fs/promises");
 const fs = require("fs");
 
-async function readCreativeDirectory() {
+async function readCreativeDirectory(pathToFolder) {
     try{
         let result ={}
         const hiddenFiles = /(^|\/)\.[^\/\.]/g;
         const allFiles = /[^\\]*\.(\w+)$/;
-        const creativeDirPath = path.join(__dirname, "/../creatives")
+        // const creativeDirPath = path.join(__dirname, "/../creatives")
 
-        const creativeFolders = await readdir(creativeDirPath)
+        const creativeFolders = await readdir(pathToFolder)
 
         for (const creativeName of creativeFolders) {
             if (!hiddenFiles.test(creativeName) && !allFiles.test(creativeName)) {
-                const sizeDirPath = path.join(__dirname, "/../creatives/", creativeName);
+                const sizeDirPath = path.join(pathToFolder, creativeName);
                 const creativeDirSize = await readdir(sizeDirPath);
 
                 let sizeDir = []
