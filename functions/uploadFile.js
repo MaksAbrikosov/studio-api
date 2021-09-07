@@ -1,7 +1,8 @@
 const axios = require("axios");
 const config = require("../config");
+const progressUpload = require("./progressUpload")
 
-async function uploadFile(url, setCookie, form, fileName){
+async function uploadFile(url, setCookie, form, fileName, fullNameForAlert){
 
     await axios({
         method: 'post',
@@ -25,8 +26,15 @@ async function uploadFile(url, setCookie, form, fileName){
         data: form,
         mode: "cors",
     })
-        .then(() => console.log(`File ${fileName} was uploaded`))
-        .catch(err => console.error(err.response));
+        .then(() => {
+            console.log(`File ${fileName} was uploaded`)
+            progressUpload(`Creative ${fullNameForAlert} was uploaded`)
+            progressUpload(`-------------------------------------------------`)
+        })
+        .catch(err =>{
+            console.error(err.response)
+            progressUpload(`Error! ${fullNameForAlert} - ${err.response.statusText}`)
+        });
 }
 
 module.exports = uploadFile;

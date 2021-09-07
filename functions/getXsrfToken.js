@@ -2,6 +2,7 @@ const axios = require("axios");
 const { parse } = require("node-html-parser");
 const config = require("../config");
 const fetch = require('node-fetch')
+const progressUpload = require("./progressUpload")
 
 async function getXsrfToken(){
     return axios({
@@ -30,11 +31,18 @@ async function getXsrfToken(){
             const node = root.querySelector('script')
             const xsrfTokenString = node.rawText.split(',').filter(val => val.match(/xsrfToken/))[0]
             // const xsrfToken = xsrfTokenString.replace(' "xsrfToken": ', "")
-            const xsrfToken = xsrfTokenString.split('"')[3]
-            return xsrfToken
+            console.log('xsrfTokenString', xsrfTokenString)
+            if(xsrfTokenString) {
+                console.log('!!!')
+                const xsrfToken = xsrfTokenString.split('"')[3]
+                return xsrfToken
+            }
+            progressUpload("Error! Update please config file!")
+
         })
         .catch(err => {
             console.error(err);
+            progressUpload("Error! Update please config file!")
         });
 }
 

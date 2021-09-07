@@ -6,6 +6,8 @@ const getCampaign = require('../functions/getCampaign')
 const getXsrfToken = require("../functions/getXsrfToken");
 const path = require("path");
 const fs = require('fs');
+const progressUpload = require("../functions/progressUpload")
+
 
 function parseConfigFile(){
     let filePath = path.join(__dirname, '../config.js');
@@ -55,9 +57,9 @@ router.get('/', async (req, res) => {
     }
 
     res.render('index', {
-        // title: 'testTitle',
         creatives: data,
-        pathToFolder: pathToFolder
+        pathToFolder: pathToFolder,
+        encodedJsonData : encodeURIComponent(JSON.stringify(data)),
     })
 })
 
@@ -80,7 +82,8 @@ router.post('/complete',  async (req, res) => {
         await addCreativeDirPath(creativePath)
     }
     await addCreativeDirPath(creativePath)
-    res.status(200).json({message: "Creatives uploaded successfully!"})
+
+    res.status(200).json({message: progressUpload()})
 })
 
 router.post('/check',  async (req, res) => {
@@ -88,8 +91,6 @@ router.post('/check',  async (req, res) => {
     const xsrfToken = await getXsrfToken()
 
     const campaign = await getCampaign(campaignId, advertiserId, ownerId, ownerId, xsrfToken)
-
-    // console.log(campaign.account.name, campaign.advertiser.name, campaign.name)
 
     if(campaign){
         res.status(200).json({
@@ -103,7 +104,6 @@ router.post('/check',  async (req, res) => {
     }
 })
 
-
 router.post('/chooseDir',  async (req, res) => {
     const localPath = req.body.localPath
 
@@ -111,9 +111,11 @@ router.post('/chooseDir',  async (req, res) => {
     if(localPath.length>0){
         data = await readCreativeDirectory(localPath)
     }
-
     res.status(400).json(data)
+})
 
+router.get('/progress',  async (req, res) => {
+    res.status(200).json({message: progressUpload()})
 })
 
 module.exports = router
