@@ -7,17 +7,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script   src="https://code.jquery.com/jquery-3.6.0.js"   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="   crossorigin="anonymous"></script>
-    <title>Uploader</title>
+    <title>Studio Tool Uploader</title>
     <style>
-        .chooseLabel {
-
+        .alert-custom{
+            color: #3a2c02;
+            background-color: #f9f1d7;
+            border-color: #fbcd4a;
+            max-height: 250px;
+            overflow-y: scroll;
         }
     </style>
+
 </head>
 <body>
     <div class="container col-8 offset-2 mt-4 mb-4">
 
-        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none">
+        <div class="alert alert-custom alert-dismissible fade show" role="alert" style="display: none">
             <div class="alertMsg"></div>
         </div>
         <form class="needs-validation" novalidate>
@@ -31,10 +36,6 @@
                             <label for="path">Creative Folder Path</label>
                             <input type="path" class="form-control col-md-8" id="path" placeholder="path" value={{ pathToFolder}}>
                         </div>
-<!--                        <div class="form-group ">-->
-<!--                            <input type="file" id="flup" class="custom-file-input"  onchange="getFolder(event)" webkitdirectory mozdirectory msdirectory odirectory directory  hidden/>-->
-<!--                            <label class="chooseLabel btn btn-primary" for="flup">Choose Directory</label>-->
-<!--                        </div>-->
 
                         <div class="form-group">
                             <label for="creativeUrl">Campaign Url</label>
@@ -83,6 +84,9 @@
         </form>
     </div>
     <script>
+
+        let decodedJsonData = decodeURIComponent("{{{encodedJsonData}}}");
+        let jsonObj = JSON.parse(decodedJsonData);
 
         let cardObj = {}
         let changedName = false
@@ -177,23 +181,46 @@
                 },
                 body: JSON.stringify({localPath})
             })
-                    .then(response => response.json())
-                    .then(data => {
-                        let container = document.getElementById('testCon')
-                        while (container.firstChild) {
-                            container.removeChild(container.firstChild);
-                        }
-                        // updateCreativeName()
-                        display(data)
-                    })
+            .then(response => response.json())
+            .then(data => {
+                let container = document.getElementById('testCon')
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+                // updateCreativeName()
+                display(data)
+            })
         })
 
 
 ///////////////////////////////////////////////////////////////////////////////////
 
         function showAlert(msg){
-            document.getElementsByClassName("alert")[0].style.display = "block";
-            document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
+            if(msg instanceof Object){
+                //remove all child
+                let alertContainer = document.getElementsByClassName('alertMsg')[0]
+                while (alertContainer.firstChild) {
+                    alertContainer.removeChild(alertContainer.firstChild)
+                }
+
+                document.getElementsByClassName("alert")[0].style.display = "block";
+
+                const divTag = document.createElement("div");
+
+                msg.map(item => {
+                    let tagP = document.createElement("p");
+                    let text = document.createTextNode(item);
+                    tagP.appendChild(text);
+                    divTag.appendChild(tagP);
+                })
+
+                let element = document.getElementsByClassName('alertMsg')[0];
+                element.appendChild(divTag);
+
+            } else {
+                document.getElementsByClassName("alert")[0].style.display = "block";
+                document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
+            }
         }
 
         function parseCampaignUrl() {
@@ -285,7 +312,7 @@
             const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
 
             if(!campaignId && !advertiserId && !ownerId){
-                showAlert(' <strong>Error!</strong> ')
+                showAlert(' <strong>Error! Please check campaign URL</strong> ')
                 return;
             }
 
@@ -321,7 +348,7 @@
             const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
 
             if(!campaignId && !advertiserId && !ownerId){
-                showAlert(' <strong>Error!</strong> ')
+                showAlert(' <strong>Error! Please check campaign URL</strong> ')
                 return;
             }
 
@@ -346,6 +373,34 @@
                 }
             })
 
+            // check progress status
+            const interval = setInterval(() => {
+                <!--let progressJsonData  = decodeURIComponent("{{{progress}}}");-->
+                <!--let progr = JSON.parse(progressJsonData);-->
+                <!--console.log(progr)-->
+
+                fetch("/progress", {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.message.length > 0){
+                        showAlert(data.message)
+                    }
+                }).catch(err => {
+                    console.log(err)
+                }).finally(() => {
+                    // scroll bottom alert progress
+                    let divEl = document.getElementsByClassName("alert-custom")[0];
+                    divEl.scrollTop = divEl.scrollHeight;
+                })
+            }, 3000)
+
+
+            // check creative folder path
             const creativePath = document.getElementById('path').value
             if(!creativePath.length){
                 showAlert('<strong>Creative folder path is empty!</strong> Please enter URL ')
@@ -373,6 +428,7 @@
                 showAlert(data.message)
                 document.getElementsByClassName("submitBtn")[0].style.display = "block";
                 document.getElementsByClassName("loadingBtn")[0].style.display = "none";
+                clearInterval(interval);
             }).catch(err => {
                 console.log(err)
             })

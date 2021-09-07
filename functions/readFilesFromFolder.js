@@ -7,7 +7,7 @@ const uploadFile = require("./uploadFile");
 
 let archiver = require('archiver');
 
-async function  readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size, creativePath){
+async function  readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size, creativePath, fullNameForAlert){
 
     // create archive
     const zipName = size + ".zip";
@@ -41,7 +41,7 @@ async function  readFilesFromFolder(creativeName, creativeId, accountId, adverti
 
     if(Object.keys(url).length > 0){
         // upload
-        await uploadFile(uploadUrl, setCookie, fileContent, zipName)
+        await uploadFile(uploadUrl, setCookie, fileContent, zipName, fullNameForAlert)
         // remove archive
         fs.unlinkSync(pathToZipFile)
         console.log(`Archive ${zipName} deleted`);
