@@ -16,10 +16,20 @@
             max-height: 250px;
             overflow-y: scroll;
         }
+        #spinner{
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            display: none;
+        }
     </style>
 
 </head>
 <body>
+    <div class="spinner-border text-primary" id="spinner" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+
     <div class="container col-8 offset-2 mt-4 mb-4">
 
         <div class="alert alert-custom alert-dismissible fade show" role="alert" style="display: none">
@@ -355,6 +365,7 @@
             document.getElementsByClassName("alert")[0].style.display = "none";
             document.getElementsByClassName("submitBtn")[0].style.display = "none";
             document.getElementsByClassName("loadingBtn")[0].style.display = "block";
+            document.getElementById("spinner").style.display = "block";
 
             let newName;
             document.querySelectorAll('.cardIn').forEach(node=> {
@@ -429,6 +440,8 @@
                 document.getElementsByClassName("submitBtn")[0].style.display = "block";
                 document.getElementsByClassName("loadingBtn")[0].style.display = "none";
                 clearInterval(interval);
+                document.getElementById("spinner").style.display = "none";
+
             }).catch(err => {
                 console.log(err)
             })
