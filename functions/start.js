@@ -30,24 +30,6 @@ let entityId;
 
 async function start(campaignId, advertiserId, ownerId, creativePath, data) {
 
-    // if(!campaignName.length){
-    //     console.log('Input Campaign Name')
-    //     return;
-    // }
-
-
-  // const campaigns = await getAllCampaigns(xsrfToken);
-
-
-  // const selectCampaign = campaigns.records.find(
-  //     (campaign) => campaign.name === campaignName
-  // );
-  //
-  // if(!selectCampaign){
-  //   console.log('Campaign not exist')
-  //   return;
-  // }
-
     const xsrfToken = await getXsrfToken()
 
     if(!xsrfToken){
@@ -59,24 +41,7 @@ async function start(campaignId, advertiserId, ownerId, creativePath, data) {
     const campaign = await getCampaign(campaignId, advertiserId, ownerId, entityId, xsrfToken)
     accountId = campaign.account.id;
 
-  // accountId = selectCampaign.account.id;
-  // advertiserId = selectCampaign.advertiser.id;
-  // ownerId = selectCampaign.entityRef.entityKey.ownerId;
-  // campaignId = selectCampaign.entityRef.entityKey.entityId;
-
-  //read creative name from creative folder
-  // const directoryPath = path.join(__dirname, "/../creatives");
-  //   const directoryPath = creativePath
-
   try {
-    // read creatives folder
-    // const folders = await readdir(directoryPath);
-    // for (const creativeName of folders)
-
-
-    //   for (const creativeName of creativeNames)
-    //
-    //   {
       for(const name of Object.keys(data)){
           for(const size of Object.values(data[name].data)){
 
@@ -117,12 +82,12 @@ async function start(campaignId, advertiserId, ownerId, creativePath, data) {
               // upload assets from local folder
               await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size, creativePath, fullNameForAlert);
 
-              // const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
-              // if(backupImage){
-              //   // set backup image and select
-              //   await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
-              //   console.log('Backup Image is marked')
-              // }
+              const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
+              if(backupImage){
+                // set backup image and select
+                await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
+                console.log('Backup Image is marked')
+              }
           }
       }
       console.log('Done')
