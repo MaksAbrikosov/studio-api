@@ -7,6 +7,7 @@ const getXsrfToken = require("../functions/getXsrfToken");
 const path = require("path");
 const fs = require('fs');
 const progressUpload = require("../functions/progressUpload")
+const checkIfCreativeExist = require("../functions/checkIfCreativeExist")
 
 
 function parseConfigFile(){
@@ -117,5 +118,26 @@ router.post('/chooseDir',  async (req, res) => {
 router.get('/progress',  async (req, res) => {
     res.status(200).json({message: progressUpload()})
 })
+
+
+router.post('/check-assets',  async (req, res) => {
+    const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
+    const {pathToFolder} = parseConfigFile()
+
+    const filteredData = Object.keys(creatives).reduce((acc, key) => {
+        if(creatives[key].data.length){
+            acc[key] = creatives[key]
+        }
+        return acc
+    }, {})
+
+    let  result
+    if(Object.keys(filteredData).length > 0){
+         result = await checkIfCreativeExist( campaignId, advertiserId, ownerId, creativePath, filteredData)
+    }
+
+    res.status(200).json({message: result })
+})
+
 
 module.exports = router

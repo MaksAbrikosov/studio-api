@@ -7,6 +7,19 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script   src="https://code.jquery.com/jquery-3.6.0.js"   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="   crossorigin="anonymous"></script>
+
+    <script
+            src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"
+    ></script>
+    <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+            integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+            crossorigin="anonymous"
+    ></script>
+
+
     <title>Studio Tool Uploader</title>
     <style>
         .alert-custom{
@@ -21,6 +34,10 @@
             right: 10px;
             top: 10px;
             display: none;
+        }
+        .alert p{
+            font-size: 13px;
+            margin: 5px 0px !important;
         }
     </style>
 
@@ -92,8 +109,39 @@
                 </button>
             </div>
         </form>
+        <div
+                class="modal fade"
+                id="exampleModal"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Selected creatives exist in Studio</h5>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                                type="button"
+                                class="btn btn-secondary cancelButton"
+                                data-dismiss="modal"
+                        >
+                            No
+                        </button>
+                        <button type="button" class="btn btn-primary confirmButton">Yes</button>
+                    </div>
+                </div>
+            </div>
+
     </div>
+
     <script>
+
 
         let decodedJsonData = decodeURIComponent("{{{encodedJsonData}}}");
         let jsonObj = JSON.parse(decodedJsonData);
@@ -197,7 +245,6 @@
                 while (container.firstChild) {
                     container.removeChild(container.firstChild);
                 }
-                // updateCreativeName()
                 display(data)
             })
         })
@@ -205,32 +252,34 @@
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-        function showAlert(msg){
+        function showAlert(msg, alertContainer){
+
             if(msg instanceof Object){
                 //remove all child
-                let alertContainer = document.getElementsByClassName('alertMsg')[0]
+                // let alertContainer = document.getElementsByClassName('alertMsg')[0]
                 while (alertContainer.firstChild) {
                     alertContainer.removeChild(alertContainer.firstChild)
                 }
 
-                document.getElementsByClassName("alert")[0].style.display = "block";
+                // document.getElementsByClassName("alert")[0].style.display = "block";
 
                 const divTag = document.createElement("div");
 
                 msg.map(item => {
                     let tagP = document.createElement("p");
+                    // tagP.setAttribute('class', `alertParagraph` )
                     let text = document.createTextNode(item);
                     tagP.appendChild(text);
                     divTag.appendChild(tagP);
                 })
 
-                let element = document.getElementsByClassName('alertMsg')[0];
-                element.appendChild(divTag);
+                alertContainer.appendChild(divTag);
 
             } else {
                 document.getElementsByClassName("alert")[0].style.display = "block";
                 document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
             }
+
         }
 
         function parseCampaignUrl() {
@@ -293,12 +342,6 @@
         }
 
         const debouncedUpdateValue = debounce(updateValue)
-
-        // document.querySelectorAll('.cardIn').forEach((node, i) => {
-        //     node.querySelector('.creativeName').addEventListener("input", function() {
-        //         debouncedUpdateValue(node, this.value)
-        //     })
-        // })
 
         const updateCreativeName = () => {
             document.querySelectorAll('.cardIn').forEach((node, i) => {
@@ -384,32 +427,6 @@
                 }
             })
 
-            // check progress status
-            const interval = setInterval(() => {
-                <!--let progressJsonData  = decodeURIComponent("{{{progress}}}");-->
-                <!--let progr = JSON.parse(progressJsonData);-->
-                <!--console.log(progr)-->
-
-                fetch("/progress", {
-                    method: "GET",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.message.length > 0){
-                        showAlert(data.message)
-                    }
-                }).catch(err => {
-                    console.log(err)
-                }).finally(() => {
-                    // scroll bottom alert progress
-                    let divEl = document.getElementsByClassName("alert-custom")[0];
-                    divEl.scrollTop = divEl.scrollHeight;
-                })
-            }, 3000)
-
 
             // check creative folder path
             const creativePath = document.getElementById('path').value
@@ -427,6 +444,81 @@
                 creatives: {...creatives}
             }
 
+            let myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
+
+            document.getElementsByClassName("confirmButton")[0].addEventListener('click', () => {
+                myModal.hide()
+                submitAssets(result)
+            })
+
+            document.getElementsByClassName("cancelButton")[0].addEventListener('click', () => {
+                myModal.hide()
+                document.getElementsByClassName("submitBtn")[0].style.display = "block";
+                document.getElementsByClassName("loadingBtn")[0].style.display = "none";
+                // clearInterval(interval);
+                document.getElementById("spinner").style.display = "none";
+
+            })
+
+
+            fetch("/check-assets", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(result)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.message.length > 0){
+                    const modalBody = document.getElementsByClassName("modal-body")[0]
+
+                    showAlert(data.message, modalBody)
+
+                    let tagP = document.createElement("p");
+                    let text = document.createTextNode("Would you like to update the assets of the selected creatives?");
+                    tagP.appendChild(text);
+                    modalBody.appendChild(tagP);
+                    myModal.show()
+                } else {
+                    submitAssets(result)
+                }
+
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+
+
+        function submitAssets(result){
+            // check progress status
+            const interval = setInterval(() => {
+
+                fetch("/progress", {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.message.length > 0){
+                        // showAlert(data.message)
+                        let alertContainer = document.getElementsByClassName('alertMsg')[0]
+                        showAlert(data.message,  alertContainer)
+                        document.getElementsByClassName("alert")[0].style.display = "block";
+
+                    }
+                }).catch(err => {
+                    console.log(err)
+                }).finally(() => {
+                    // scroll bottom alert progress
+                    let divEl = document.getElementsByClassName("alert-custom")[0];
+                    divEl.scrollTop = divEl.scrollHeight;
+                })
+            }, 3000)
+
+
             fetch("/complete", {
                 method: "POST",
                 headers: {
@@ -436,7 +528,9 @@
             })
             .then(response => response.json())
             .then(data => {
-                showAlert(data.message)
+                // showAlert(data.message)
+                let alertContainer = document.getElementsByClassName('alertMsg')[0]
+                showAlert(data.message,  alertContainer)
                 document.getElementsByClassName("submitBtn")[0].style.display = "block";
                 document.getElementsByClassName("loadingBtn")[0].style.display = "none";
                 clearInterval(interval);
@@ -446,6 +540,7 @@
                 console.log(err)
             })
         }
+
     </script>
 </body>
 </html>
