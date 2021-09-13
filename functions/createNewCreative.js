@@ -1,7 +1,7 @@
 const axios = require("axios");
 const config = require("../config");
 
-async function createNewCreative(creativeName, size, accountId, advertiserId, campaignId, xsrfToken) {
+async function createNewCreative(creativeName, size, accountParameters) {
 
     // const nameArrayLength = creativeName.split("_").length
     //
@@ -15,13 +15,13 @@ async function createNewCreative(creativeName, size, accountId, advertiserId, ca
     const arguments = [
         {
             "accountRef":{
-                "id": accountId
+                "id": accountParameters.accountId
             },
             "advertiserRef":{
-                "id": advertiserId,
+                "id": accountParameters.advertiserId,
             },
             "campaignRef":{
-                "id": campaignId
+                "id": accountParameters.campaignId
             },
             "format": "INPAGE",
             "dimension": {
@@ -45,7 +45,7 @@ async function createNewCreative(creativeName, size, accountId, advertiserId, ca
             "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
             "content-type": "text/plain",
             // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCN3yywE=",
-            "x-xsrf-token": xsrfToken,
+            "x-xsrf-token": accountParameters.xsrfToken,
             "cookie": `${config.Secure3PSID} ${config.SID}`
         },
         referrerPolicy: "strict-origin-when-cross-origin",

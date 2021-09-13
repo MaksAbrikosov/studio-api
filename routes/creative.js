@@ -4,49 +4,13 @@ const readCreativeDirectory = require('../functions/readCreativeDirectory')
 const start = require('../functions/start')
 const getCampaign = require('../functions/getCampaign')
 const getXsrfToken = require("../functions/getXsrfToken");
-const path = require("path");
-const fs = require('fs');
 const progressUpload = require("../functions/progressUpload")
 const checkIfCreativeExist = require("../functions/checkIfCreativeExist")
 
+const parseConfigFile = require("../functions/parseConfigFile")
+const  addCreativeDirPath = require("../functions/addCreativeDirPath")
 
-function parseConfigFile(){
-    let filePath = path.join(__dirname, '../config.js');
-    let pathToFolder = "";
-    const dirStringRegExp = /^(.*)CreativeDir(.*)\:(.*)$/gm
-
-    const fileContent = fs.readFileSync(filePath).toString('utf8')
-    // console.log(fileContent.split("\n"))
-
-    if(dirStringRegExp.test(fileContent)){
-        const folderFromConfig = fileContent.match(dirStringRegExp)[0].trim()
-        pathToFolder = folderFromConfig.split(":")[1].trim().slice(1,-2)
-    }
-    return {
-        fileContent,
-        pathToFolder
-    }
-}
-
-async function addCreativeDirPath(creativePath){
-
-    const dirStringRegExp = /^(.*)CreativeDir(.*)\:(.*)$/gm
-
-    const {fileContent} = await parseConfigFile()
-
-    if(!fileContent){
-        console.log('Didn`t find creativeDir in the config.js')
-    }
-
-    const fileContentArray = fileContent.split('\n')
-    const indexDirString =  fileContentArray.indexOf(fileContent.match(dirStringRegExp)[0])
-    if(indexDirString !== -1){
-        fileContentArray[indexDirString] = `    CreativeDir: "${creativePath.toString()}",`;
-        const fileContentString = fileContentArray.join("\n")
-        let filePath = path.join(__dirname, '../config.js');
-        fs.writeFileSync(filePath, fileContentString)
-    }
-}
+let accountParameters = {}
 
 router.get('/', async (req, res) => {
 
@@ -64,7 +28,7 @@ router.get('/', async (req, res) => {
     })
 })
 
-router.post('/complete',  async (req, res) => {
+router.post('/check-assets',  async (req, res) => {
     const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
     const {pathToFolder} = parseConfigFile()
 
@@ -75,8 +39,38 @@ router.post('/complete',  async (req, res) => {
         return acc
     }, {})
 
+    let  result
     if(Object.keys(filteredData).length > 0){
-        await start( campaignId, advertiserId, ownerId, creativePath, filteredData)
+        result = await checkIfCreativeExist(campaignId, advertiserId, ownerId, creativePath, filteredData)
+    }
+
+    const {accountId, creativeId, entityId, xsrfToken, creative} = result
+
+    accountParameters = {
+        accountId, creativeId, entityId, xsrfToken, creative
+    }
+
+    res.status(200).json({message: result.messages })
+})
+
+router.post('/complete',  async (req, res) => {
+    const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
+
+    const {pathToFolder} = parseConfigFile()
+
+    const filteredData = Object.keys(creatives).reduce((acc, key) => {
+        if(creatives[key].data.length){
+            acc[key] = creatives[key]
+        }
+        return acc
+    }, {})
+
+    accountParameters = {...accountParameters, campaignId, advertiserId, ownerId, creativePath, creatives: filteredData}
+
+    if(Object.keys(filteredData).length > 0){
+        // await start( campaignId, advertiserId, ownerId, creativePath, filteredData, accountParameters)
+        await start(accountParameters, filteredData)
+
     }
 
     if(!pathToFolder.length>0){
@@ -118,26 +112,5 @@ router.post('/chooseDir',  async (req, res) => {
 router.get('/progress',  async (req, res) => {
     res.status(200).json({message: progressUpload()})
 })
-
-
-router.post('/check-assets',  async (req, res) => {
-    const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
-    const {pathToFolder} = parseConfigFile()
-
-    const filteredData = Object.keys(creatives).reduce((acc, key) => {
-        if(creatives[key].data.length){
-            acc[key] = creatives[key]
-        }
-        return acc
-    }, {})
-
-    let  result
-    if(Object.keys(filteredData).length > 0){
-         result = await checkIfCreativeExist( campaignId, advertiserId, ownerId, creativePath, filteredData)
-    }
-
-    res.status(200).json({message: result })
-})
-
 
 module.exports = router

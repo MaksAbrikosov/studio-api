@@ -1,100 +1,62 @@
 const path = require("path");
 const fs = require("fs");
-// const { readdir } = require( "fs/promises");
 const FormData = require("form-data");
-// const config = require("../config.js");
-const getXsrfToken = require("./getXsrfToken");
 
-
-// const getAllAdvertisers = require("./getAllAdvertisers");
-const getAllCampaigns = require("./getAllCampaigns");
-const getAllCreatives = require("./getAllCreatives");
 const createNewCreative = require("./createNewCreative");
 const readFilesFromFolder = require("./readFilesFromFolder");
 const removeAssets = require("./removeAssets");
 const getAssetsFromCreative = require("./getAssetsFromCreative");
-const searchBackupImage = require("./searchBackupImage");
-const setBackupImage = require("./setBackupImage");
-
-const getCampaign = require("./getCampaign")
+// const searchBackupImage = require("./searchBackupImage");
+// const setBackupImage = require("./setBackupImage");
 const progressUpload = require("./progressUpload")
 
+async function start(accountParameters, data) {
+    try {
+        for(const name of Object.keys(data)){
+            for(const size of Object.values(data[name].data)){
+
+                const creativeName = data[name].newName;
+
+                const fullNameForAlert = `${creativeName}${size}`
+
+                let filePath = path.join(accountParameters.creativePath, creativeName+size);
+                const form = new FormData();
+                form.append("folder", fs.createReadStream(filePath));
+
+                if (accountParameters.creative) {
 
 
-let accountId;
-// let advertiserId;
-// let ownerId;
-// let campaignId;
-let entityId;
+                    console.log(`Creative ${fullNameForAlert} has already exist! Updating...!`)
+                    progressUpload(`Creative ${fullNameForAlert} has already exist! Updating...!`)
 
+                    const assetsArray = await getAssetsFromCreative(accountParameters);
 
-async function start(campaignId, advertiserId, ownerId, creativePath, data) {
-
-    const xsrfToken = await getXsrfToken()
-
-    if(!xsrfToken){
-        return
-    }
-
-
-    const creatives = await getAllCreatives(xsrfToken);
-    const campaign = await getCampaign(campaignId, advertiserId, ownerId, entityId, xsrfToken)
-    accountId = campaign.account.id;
-
-  try {
-      for(const name of Object.keys(data)){
-          for(const size of Object.values(data[name].data)){
-
-              // const creativeName = `${data[name].newName}_${size}`
-              const creativeName = data[name].newName;
-
-              const fullNameForAlert = `${creativeName}${size}`
-
-                  let filePath = path.join(creativePath, creativeName+size);
-              const form = new FormData();
-              form.append("folder", fs.createReadStream(filePath));
-              const creative = creatives.records.find((item) => item.name === creativeName+size);
-
-
-              let creativeId;
-              if (creative) {
-                creativeId = creative.id;
-                entityId = creative.entityRef.entityKey.entityId;
-
-                console.log(`Creative ${fullNameForAlert} has already exist! Updating...!`)
-                progressUpload(`Creative ${fullNameForAlert} has already exist! Updating...!`)
-
-                const assetsArray = await getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId, xsrfToken);
-
-                if(assetsArray && assetsArray.length > 0){
-                  await removeAssets(assetsArray, creativeId, advertiserId, ownerId, entityId, xsrfToken);
-                  console.log('Assets deleted');
-                  progressUpload(`Assets deleted`)
+                    if(assetsArray && assetsArray.length > 0){
+                        await removeAssets(assetsArray, accountParameters);
+                        console.log('Assets deleted');
+                        progressUpload(`Assets deleted`)
+                    }
+                } else {
+                    // create a new creative in Studio
+                    accountParameters.creativeId = await createNewCreative(creativeName, size, accountParameters)
+                    console.log(`Creative ${creativeName}${size} created!`);
+                    progressUpload(`Creative ${fullNameForAlert} created!`)
                 }
-              } else {
-                // create a new creative in Studio
-                creativeId = await createNewCreative(creativeName, size, accountId, advertiserId, campaignId, xsrfToken);
-                console.log(`Creative ${creativeName}${size} created!`);
-                progressUpload(`Creative ${fullNameForAlert} created!`)
-              }
 
-              // await getAllCampaigns(xsrfToken)
-              // upload assets from local folder
-              await readFilesFromFolder(creativeName, creativeId, accountId, advertiserId, name, size, creativePath, fullNameForAlert);
+                await readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert);
 
-              const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
-              if(backupImage){
-                // set backup image and select
-                await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
-                console.log('Backup Image is marked')
-              }
-          }
-      }
-      console.log('Done')
-  } catch (err) {
-    console.error(err);
-  }
+                // const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
+                // if(backupImage){
+                //     // set backup image and select
+                //     await setBackupImage(creativeId, backupImage, advertiserId, xsrfToken)
+                //     console.log('Backup Image is marked')
+                // }
+            }
+        }
+        console.log('Done')
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 module.exports = start
-// start();

@@ -1,21 +1,21 @@
 const axios = require("axios");
 const config = require("../config");
 
-function getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId, xsrfToken){
+function getAssetsFromCreative(accountParameters){
 
     const arguments = [
         {
-            "id":advertiserId,
+            "id":accountParameters.advertiserId,
             "entityKey":{
-                "entityId":advertiserId,
-                "ownerId":ownerId
+                "entityId":accountParameters.advertiserId,
+                "ownerId":accountParameters.ownerId
             }
         },
         {
-            "id":creativeId,
+            "id":accountParameters.creativeId,
             "entityKey":{
-                "entityId":entityId,
-                "ownerId":ownerId
+                "entityId":accountParameters.entityId,
+                "ownerId":accountParameters.ownerId
             }
         }
     ]
@@ -39,7 +39,7 @@ function getAssetsFromCreative(creativeId, advertiserId, ownerId, entityId, xsrf
             // "sec-fetch-mode": "cors",
             // "sec-fetch-site": "same-origin",
             // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
-            "x-xsrf-token": xsrfToken,
+            "x-xsrf-token": accountParameters.xsrfToken,
             "cookie": `${config.Secure3PSID} ${config.SID}`,
         },
         referrer: "https://www.google.com/doubleclick/studio/",
