@@ -18,32 +18,13 @@
             integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
             crossorigin="anonymous"
     ></script>
-
+    <link rel="stylesheet" href="/css/style.css">
 
     <title>Studio Tool Uploader</title>
-    <style>
-        .alert-custom{
-            color: #3a2c02;
-            background-color: #f9f1d7;
-            border-color: #fbcd4a;
-            max-height: 250px;
-            overflow-y: scroll;
-        }
-        #spinner{
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            display: none;
-        }
-        .alert p{
-            font-size: 13px;
-            margin: 5px 0px !important;
-        }
-    </style>
 
 </head>
 <body>
-    <div class="spinner-border text-primary" id="spinner" role="status">
+    <div class="spinner-border text-success" id="spinner" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
 
@@ -54,27 +35,28 @@
         </div>
         <form class="needs-validation" novalidate>
 
-            <div class="card border-secondary mb-3 " >
+            <div class="card border-secondary mb-3 configuration" >
                 <div class="card-header">Configuration</div>
                 <div class="card-body text-secondary">
                     <p class="card-text">
 
-                        <div class="form-group">
-                            <label for="path">Creative Folder Path</label>
+                        <div class="mb-3">
+                            <label for="path" class="form-label">Creative Folder Path</label>
                             <input type="path" class="form-control col-md-8" id="path" placeholder="path" value={{ pathToFolder}}>
                         </div>
 
-                        <div class="form-group">
-                            <label for="creativeUrl">Campaign Url</label>
+                        <div class="mb-3">
+                            <label for="creativeUrl" class="form-label">Campaign Url</label>
                             <input type="text" class="creativeUrl form-control" id="creativeUrl" name="creativeUrl" required>
                         </div>
 
-
-                        <button class="btn btn-primary checkCampaignIdBtn" id="checkCampaignIdBtn" >Check Campaign</button>
-                        <button class="btn btn-primary loadingCheckCampaign" type="button" disabled style="display: none">
+                    <div class="d-grid gap-2 mt-3">
+                        <button class="btn btn-green checkCampaignIdBtn"  type="button" id="checkCampaignIdBtn" onclick="checkCampaign()" >Check Campaign</button>
+                        <button class="btn btn-green loadingCheckCampaign" type="button" disabled style="display: none">
                             <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
                             Loading...
                         </button>
+                    </div>
                     </p>
                 </div>
             </div>
@@ -102,8 +84,8 @@
             {{/each}}
             </div>
             <div class="d-grid gap-2 mt-3">
-                <button class="btn btn-primary submitBtn" id="submit" type="submit">Submit</button>
-                <button class="btn btn-primary loadingBtn" type="button" disabled style="display: none">
+                <button class="btn btn-green submitBtn" id="submit" type="submit">Submit</button>
+                <button class="btn btn-green loadingBtn" type="button" disabled style="display: none">
                     <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
                     Loading...
                 </button>
@@ -128,23 +110,27 @@
                     <div class="modal-footer">
                         <button
                                 type="button"
-                                class="btn btn-secondary cancelButton"
+                                class="btn btn-lightGrey cancelButton"
                                 data-dismiss="modal"
                         >
                             No
                         </button>
-                        <button type="button" class="btn btn-primary confirmButton">Yes</button>
+                        <button type="button" class="btn btn-green confirmButton">Yes</button>
                     </div>
                 </div>
             </div>
 
     </div>
 
+    <script src="/js/parseCampaignUrl.js"></script>
+    <script src="/js/showAlert.js"></script>
+    <script src="/js/checkIfCampaignExist.js"></script>
+
     <script>
 
 
-        let decodedJsonData = decodeURIComponent("{{{encodedJsonData}}}");
-        let jsonObj = JSON.parse(decodedJsonData);
+        <!--let decodedJsonData = decodeURIComponent("{{{encodedJsonData}}}");-->
+        <!--let jsonObj = JSON.parse(decodedJsonData);-->
 
         let cardObj = {}
         let changedName = false
@@ -249,62 +235,6 @@
             })
         })
 
-
-///////////////////////////////////////////////////////////////////////////////////
-
-        function showAlert(msg, alertContainer){
-
-            if(msg instanceof Object){
-                //remove all child
-                // let alertContainer = document.getElementsByClassName('alertMsg')[0]
-                while (alertContainer.firstChild) {
-                    alertContainer.removeChild(alertContainer.firstChild)
-                }
-
-                // document.getElementsByClassName("alert")[0].style.display = "block";
-
-                const divTag = document.createElement("div");
-
-                msg.map(item => {
-                    let tagP = document.createElement("p");
-                    // tagP.setAttribute('class', `alertParagraph` )
-                    let text = document.createTextNode(item);
-                    tagP.appendChild(text);
-                    divTag.appendChild(tagP);
-                })
-
-                alertContainer.appendChild(divTag);
-
-            } else {
-                document.getElementsByClassName("alert")[0].style.display = "block";
-                document.getElementsByClassName('alertMsg')[0].innerHTML = msg;
-            }
-
-        }
-
-        function parseCampaignUrl() {
-            const creativeUrlValue = document.getElementsByName('creativeUrl')[0].value
-
-            if(!creativeUrlValue.length){
-                showAlert(' <strong>Campaign URL is empty!</strong> Please enter URL ')
-                document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
-                document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
-                return;
-            }
-
-            // const campaignId = creativeUrlValue.slice(creativeUrlValue.indexOf('campaignId='), creativeUrlValue.indexOf('&')).split("=")[1]
-            const parseUrl = creativeUrlValue.split(/\=|&/)
-            const campaignId = parseUrl[1]
-            const advertiserId = parseUrl[3]
-            const ownerId = parseUrl[5]
-
-            return {
-                campaignId,
-                advertiserId,
-                ownerId
-            }
-        }
-
     //////////////////////////////////////////////////////////////////////////////////////////
         // Changes checkbox labels when changed creative name
 
@@ -354,44 +284,6 @@
 
         updateCreativeName()
 
-        // CHECK IF CAMPAIGN EXIST
-
-        document.getElementById('checkCampaignIdBtn').onclick = function (e){
-            e.preventDefault();
-
-            document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "none";
-            document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "block";
-
-            const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
-
-            if(!campaignId && !advertiserId && !ownerId){
-                showAlert(' <strong>Error! Please check campaign URL</strong> ')
-                return;
-            }
-
-            const result = {
-                campaignId,
-                advertiserId,
-                ownerId
-            }
-
-            fetch("/check", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(result)
-            })
-                    .then(response => response.json())
-                    .then(data => {
-                        const {accountName, advertiserName, campaignName} = data;
-                        showAlert(`Path in Studio : ${accountName} | ${advertiserName} | ${campaignName}`)
-                        document.getElementsByClassName("checkCampaignIdBtn")[0].style.display = "block";
-                        document.getElementsByClassName("loadingCheckCampaign")[0].style.display = "none";
-                    }).catch(err => {
-                console.log(err)
-            })
-        }
     ////////////////////////////////////////////////////////////////////////////
         // SUBMIT
 
@@ -405,11 +297,6 @@
                 return;
             }
 
-            document.getElementsByClassName("alert")[0].style.display = "none";
-            document.getElementsByClassName("submitBtn")[0].style.display = "none";
-            document.getElementsByClassName("loadingBtn")[0].style.display = "block";
-            document.getElementById("spinner").style.display = "block";
-
             let newName;
             document.querySelectorAll('.cardIn').forEach(node=> {
                 if(changedName){
@@ -420,7 +307,7 @@
 
                 const originName = node.querySelector('input[type=text]').getAttribute('value')
                 const checked = [...node.querySelectorAll('input[type=checkbox]:checked')].map(e=> e.value)
-                // creatives[name] = checked
+
                 creatives[originName] = {
                     newName,
                     data:checked
@@ -436,13 +323,14 @@
             }
 
             const result = {
-                // campaignName,
                 campaignId,
                 advertiserId,
                 ownerId,
                 creativePath,
                 creatives: {...creatives}
             }
+
+            // console.log('result', result)
 
             let myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
 
@@ -460,35 +348,49 @@
 
             })
 
+            // let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            // let checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
 
-            fetch("/check-assets", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(result)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.message.length > 0){
-                    const modalBody = document.getElementsByClassName("modal-body")[0]
+            let countCheckedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked').length
 
-                    showAlert(data.message, modalBody)
+            if(countCheckedCheckboxes !== 0){
 
-                    let tagP = document.createElement("p");
-                    let text = document.createTextNode("Would you like to update the assets of the selected creatives?");
-                    tagP.appendChild(text);
-                    modalBody.appendChild(tagP);
-                    myModal.show()
-                } else {
-                    submitAssets(result)
-                }
+                document.getElementsByClassName("alert")[0].style.display = "none";
+                document.getElementsByClassName("submitBtn")[0].style.display = "none";
+                document.getElementsByClassName("loadingBtn")[0].style.display = "block";
+                document.getElementById("spinner").style.display = "block";
 
-            }).catch(err => {
-                console.log(err)
-            })
+
+                fetch("/check-assets", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(result)
+                })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.message.length > 0){
+                                const modalBody = document.getElementsByClassName("modal-body")[0]
+
+                                showAlert(data.message, modalBody)
+
+                                let tagP = document.createElement("p");
+                                let text = document.createTextNode("Would you like to update the assets of the selected creatives?");
+                                tagP.appendChild(text);
+                                modalBody.appendChild(tagP);
+                                myModal.show()
+                            } else {
+                                submitAssets(result)
+                            }
+
+                        }).catch(err => {
+                    console.log(err)
+                })
+            } else {
+                showAlert(`Please select creatives to upload`)
+            }
         }
-
 
         function submitAssets(result){
             // check progress status

@@ -1,20 +1,19 @@
 const path = require("path");
 const fs = require("fs");
-// const { readdir } = require( "fs/promises");
 const FormData = require("form-data");
-// const config = require("../config.js");
 const getXsrfToken = require("./getXsrfToken");
 
 const getAllCreatives = require("./getAllCreatives");
-const removeAssets = require("./removeAssets");
-const getAssetsFromCreative = require("./getAssetsFromCreative");
 const getCampaign = require("./getCampaign")
-const progressUpload = require("./progressUpload")
 
 let accountId;
-let entityId;
+// let entityId;
 
 async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativePath, data) {
+
+    let creativeId;
+    let entityId;
+    let creative;
 
     const xsrfToken = await getXsrfToken()
 
@@ -23,7 +22,7 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
     }
 
 
-    const creatives = await getAllCreatives(xsrfToken);
+    const allCreativesFromStudio = await getAllCreatives(xsrfToken);
     const campaign = await getCampaign(campaignId, advertiserId, ownerId, entityId, xsrfToken)
     accountId = campaign.account.id;
 
@@ -41,10 +40,10 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
                 let filePath = path.join(creativePath, creativeName+size);
                 const form = new FormData();
                 form.append("folder", fs.createReadStream(filePath));
-                const creative = creatives.records.find((item) => item.name === creativeName+size);
+                creative = allCreativesFromStudio.records.find((item) => item.name === creativeName+size);
 
 
-                let creativeId;
+
                 if (creative) {
                     creativeId = creative.id;
                     entityId = creative.entityRef.entityKey.entityId;
@@ -53,11 +52,18 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
                 }
             }
         }
-        return messages
+        return{
+            messages,
+            xsrfToken,
+            accountId,
+            creativeId,
+            entityId,
+            creative
+        }
+
     } catch (err) {
         console.error(err);
     }
 }
 
 module.exports = checkIfCreativeExist
-// start();

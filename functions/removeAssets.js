@@ -1,22 +1,22 @@
 const axios = require("axios");
 const config = require("../config");
 
-async function removeAssets(assets, creativeId, advertiserId, ownerId, entityId, xsrfToken){
+async function removeAssets(assets, accountParameters){
 
     const arguments = [
         {
             "entityKey":{
-                "entityId":advertiserId,
-                "ownerId":ownerId
+                "entityId":accountParameters.advertiserId,
+                "ownerId":accountParameters.ownerId
             },
-            "id":advertiserId,
+            "id":accountParameters.advertiserId,
         },
         {
             "entityKey":{
-                "entityId":entityId,
-                "ownerId":ownerId
+                "entityId":accountParameters.entityId,
+                "ownerId":accountParameters.ownerId
             },
-            "id":creativeId,
+            "id":accountParameters.creativeId,
         },
         assets
     ]
@@ -40,7 +40,7 @@ async function removeAssets(assets, creativeId, advertiserId, ownerId, entityId,
             // "sec-fetch-mode": "cors",
             // "sec-fetch-site": "same-origin",
             // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
-            "x-xsrf-token": xsrfToken,
+            "x-xsrf-token": accountParameters.xsrfToken,
             "cookie": `${config.Secure3PSID} ${config.SID}`,
         },
         referrer: "https://www.google.com/doubleclick/studio/",

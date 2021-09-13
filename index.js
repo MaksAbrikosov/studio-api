@@ -23,7 +23,8 @@ const hbs = exphbs.create({
             return encodeURIComponent(JSON.stringify(progr))
         } ,
         count: (val) => encodeURIComponent(JSON.stringify(val + 1)),
-    }
+    },
+    // jsDir: __dirname + '/views/assets/js/',
 })
 
 
@@ -32,6 +33,9 @@ app.set('view engine', 'hbs')
 app.set('views', 'views')
 
 app.use('/', creativeRoutes)
+app.use('/js', express.static(__dirname + '/views/assets/js'));
+app.use('/css', express.static(__dirname + '/views/assets/css'));
+
 
 app.listen(PORT, ()=> {
     console.log(`Server has been started on port ${PORT}...`)

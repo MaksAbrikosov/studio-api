@@ -1,13 +1,13 @@
 const axios = require("axios");
 const config = require("../config");
 
- function getUrl(creativeId, fileName, accountId, advertiserId) {
+ function getUrl(accountParameters, fileName) {
 
   const payload = {
     TYPE: "CREATIVE",
-    ACCOUNT_ID: accountId,
-    ADVERTISER_ID: advertiserId,
-    CREATIVE_ID: creativeId,
+    ACCOUNT_ID: accountParameters.accountId,
+    ADVERTISER_ID: accountParameters.advertiserId,
+    CREATIVE_ID: accountParameters.creativeId,
   };
 
   return axios({
