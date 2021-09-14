@@ -1,7 +1,7 @@
 const axios = require("axios");
 const config = require("../config");
 
-async function removeAssets(assets, accountParameters){
+async function removeAssets(assets, accountParameters, creativeId, entityId){
 
     const arguments = [
         {
@@ -13,10 +13,10 @@ async function removeAssets(assets, accountParameters){
         },
         {
             "entityKey":{
-                "entityId":accountParameters.entityId,
+                "entityId":entityId,
                 "ownerId":accountParameters.ownerId
             },
-            "id":accountParameters.creativeId,
+            "id":creativeId,
         },
         assets
     ]

@@ -7,12 +7,9 @@ const getAllCreatives = require("./getAllCreatives");
 const getCampaign = require("./getCampaign")
 
 let accountId;
-// let entityId;
 
 async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativePath, data) {
 
-    let creativeId;
-    let entityId;
     let creative;
 
     const xsrfToken = await getXsrfToken()
@@ -21,9 +18,8 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
         return
     }
 
-
     const allCreativesFromStudio = await getAllCreatives(xsrfToken);
-    const campaign = await getCampaign(campaignId, advertiserId, ownerId, entityId, xsrfToken)
+    const campaign = await getCampaign(campaignId, advertiserId, ownerId, xsrfToken)
     accountId = campaign.account.id;
 
     const messages = []
@@ -45,9 +41,6 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
 
 
                 if (creative) {
-                    creativeId = creative.id;
-                    entityId = creative.entityRef.entityKey.entityId;
-
                     messages.push(fullNameForAlert)
                 }
             }
@@ -56,9 +49,7 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
             messages,
             xsrfToken,
             accountId,
-            creativeId,
-            entityId,
-            creative
+            allCreativesFromStudio
         }
 
     } catch (err) {
