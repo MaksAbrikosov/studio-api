@@ -32,6 +32,8 @@ router.post('/check-assets',  async (req, res) => {
     const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
     const {pathToFolder} = parseConfigFile()
 
+    let  result
+
     const filteredData = Object.keys(creatives).reduce((acc, key) => {
         if(creatives[key].data.length){
             acc[key] = creatives[key]
@@ -39,16 +41,13 @@ router.post('/check-assets',  async (req, res) => {
         return acc
     }, {})
 
-    let  result
     if(Object.keys(filteredData).length > 0){
         result = await checkIfCreativeExist(campaignId, advertiserId, ownerId, creativePath, filteredData)
     }
 
-    const {accountId, creativeId, entityId, xsrfToken, creative} = result
+    const {accountId, xsrfToken, allCreativesFromStudio} = result
 
-    accountParameters = {
-        accountId, creativeId, entityId, xsrfToken, creative
-    }
+    accountParameters = { accountId, xsrfToken, allCreativesFromStudio}
 
     res.status(200).json({message: result.messages })
 })
@@ -70,7 +69,6 @@ router.post('/complete',  async (req, res) => {
     if(Object.keys(filteredData).length > 0){
         // await start( campaignId, advertiserId, ownerId, creativePath, filteredData, accountParameters)
         await start(accountParameters, filteredData)
-
     }
 
     if(!pathToFolder.length>0){
@@ -85,7 +83,7 @@ router.post('/check',  async (req, res) => {
     const { campaignId, advertiserId, ownerId } = req.body
     const xsrfToken = await getXsrfToken()
 
-    const campaign = await getCampaign(campaignId, advertiserId, ownerId, ownerId, xsrfToken)
+    const campaign = await getCampaign(campaignId, advertiserId, ownerId, xsrfToken)
 
     if(campaign){
         res.status(200).json({

@@ -11,6 +11,9 @@ const getAssetsFromCreative = require("./getAssetsFromCreative");
 const progressUpload = require("./progressUpload")
 
 async function start(accountParameters, data) {
+    let creative;
+    let creativeId;
+
     try {
         for(const name of Object.keys(data)){
             for(const size of Object.values(data[name].data)){
@@ -23,27 +26,32 @@ async function start(accountParameters, data) {
                 const form = new FormData();
                 form.append("folder", fs.createReadStream(filePath));
 
-                if (accountParameters.creative) {
+                creative = accountParameters.allCreativesFromStudio.records.find((item) => item.name === creativeName+size);
 
+                if (creative) {
+                    // console.log('accountParameters.creative', creative)
+
+                    creativeId = creative.id;
+                    entityId = creative.entityRef.entityKey.entityId;
 
                     console.log(`Creative ${fullNameForAlert} has already exist! Updating...!`)
                     progressUpload(`Creative ${fullNameForAlert} has already exist! Updating...!`)
 
-                    const assetsArray = await getAssetsFromCreative(accountParameters);
+                    const assetsArray = await getAssetsFromCreative(accountParameters, creativeId, entityId);
 
                     if(assetsArray && assetsArray.length > 0){
-                        await removeAssets(assetsArray, accountParameters);
+                        await removeAssets(assetsArray, accountParameters, creativeId, entityId);
                         console.log('Assets deleted');
                         progressUpload(`Assets deleted`)
                     }
                 } else {
                     // create a new creative in Studio
-                    accountParameters.creativeId = await createNewCreative(creativeName, size, accountParameters)
+                    creativeId = await createNewCreative(creativeName, size, accountParameters)
                     console.log(`Creative ${creativeName}${size} created!`);
                     progressUpload(`Creative ${fullNameForAlert} created!`)
                 }
 
-                await readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert);
+                await readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert, creativeId);
 
                 // const backupImage = await searchBackupImage(creativeId, advertiserId, ownerId, entityId, xsrfToken);
                 // if(backupImage){

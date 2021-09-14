@@ -7,7 +7,7 @@ const uploadFile = require("./uploadFile");
 
 let archiver = require('archiver');
 
-async function  readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert){
+async function  readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert, creativeId){
 
     // create archive
     const zipName = size + ".zip";
@@ -15,8 +15,6 @@ async function  readFilesFromFolder(creativeName, accountParameters, name, size,
     const source = path.join(accountParameters.creativePath, `${name}/${size}`);
     const output = path.join(accountParameters.creativePath, `${name}`, zipName);
     const pathToZipFile = path.join(accountParameters.creativePath, `${name}/${zipName}`)
-
-
 
     const archive = archiver('zip', { zlib: { level: 9 }});
     const stream = fs.createWriteStream(output);
@@ -30,7 +28,7 @@ async function  readFilesFromFolder(creativeName, accountParameters, name, size,
     await archive.finalize();
     console.log(`Archive ${zipName} created`);
 
-    const url = await getUrl(accountParameters, zipName);
+    const url = await getUrl(accountParameters, zipName, creativeId);
 
     const {uploadUrl, setCookie} = url;
 

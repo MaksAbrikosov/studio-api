@@ -1,7 +1,7 @@
 const axios = require("axios");
 const config = require("../config");
 
-function getAssetsFromCreative(accountParameters){
+function getAssetsFromCreative(accountParameters, creativeId, entityId){
 
     const arguments = [
         {
@@ -12,9 +12,9 @@ function getAssetsFromCreative(accountParameters){
             }
         },
         {
-            "id":accountParameters.creativeId,
+            "id":creativeId,
             "entityKey":{
-                "entityId":accountParameters.entityId,
+                "entityId":entityId,
                 "ownerId":accountParameters.ownerId
             }
         }

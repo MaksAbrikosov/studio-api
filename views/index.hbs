@@ -125,9 +125,9 @@
     <script src="/js/parseCampaignUrl.js"></script>
     <script src="/js/showAlert.js"></script>
     <script src="/js/checkIfCampaignExist.js"></script>
+    <script src="/js/updateCreativeName.js"></script>
 
     <script>
-
 
         <!--let decodedJsonData = decodeURIComponent("{{{encodedJsonData}}}");-->
         <!--let jsonObj = JSON.parse(decodedJsonData);-->
@@ -135,6 +135,9 @@
         let cardObj = {}
         let changedName = false
         let creatives = {}
+        let result = {}
+
+        let myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
 
        document.querySelectorAll('.cardIn input[type="text"]').forEach(el => {
            Object.assign(cardObj, {[el.id] : null })
@@ -235,58 +238,22 @@
             })
         })
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-        // Changes checkbox labels when changed creative name
-
-        // TODO -  debounce or throttle
-        function debounce(fn, ms = 150) {
-            let timer;
-            return (...args) => {
-                clearTimeout(timer)
-                timer = setTimeout(() => {
-                    fn(...args)
-                    // fn.apply(this, args)
-                }, ms)
-            }
-        }
-
-        function updateValue(node, nameId, value){
-            let arrSizes = []
-
-            node.querySelectorAll('.lab').forEach(
-                (element, i) => {
-                    if(!cardObj[nameId]){
-                        const sizes = element.innerHTML.split('_')[1]
-                        arrSizes.push(sizes)
-                    }
-                }
-            )
-            changedName = true
-            if(!cardObj[nameId]) {
-                cardObj[nameId] = arrSizes
-            }
-            node.querySelectorAll('.lab').forEach((el, i) => {
-                el.innerText = `${value}${cardObj[nameId][i]}`
-            })
-
-        }
-
-        const debouncedUpdateValue = debounce(updateValue)
-
-        const updateCreativeName = () => {
-            document.querySelectorAll('.cardIn').forEach((node, i) => {
-                node.querySelector('.creativeName').addEventListener("input", function() {
-                    const nameId = node.getElementsByClassName('creativeName')[0].id
-                    debouncedUpdateValue(node, nameId, this.value)
-                })
-            })
-        }
-
-        updateCreativeName()
-
     ////////////////////////////////////////////////////////////////////////////
         // SUBMIT
 
+        function confirmUpload(){
+            myModal.hide()
+            submitAssets(result)
+        }
+
+        function cancelUpload(){
+            myModal.hide()
+            document.getElementsByClassName("submitBtn")[0].style.display = "block";
+            document.getElementsByClassName("loadingBtn")[0].style.display = "none";
+            document.getElementById("spinner").style.display = "none";
+        }
+
+        // document.getElementById('submit').onclick = function(e) {
         document.getElementById('submit').onclick = function(e) {
             e.preventDefault();
 
@@ -314,15 +281,14 @@
                 }
             })
 
-
             // check creative folder path
             const creativePath = document.getElementById('path').value
             if(!creativePath.length){
-                showAlert('<strong>Creative folder path is empty!</strong> Please enter URL ')
+                showAlert('<strong>Creative folder path is empty!</strong> Please enter URL')
                 return;
             }
 
-            const result = {
+             result = {
                 campaignId,
                 advertiserId,
                 ownerId,
@@ -330,27 +296,11 @@
                 creatives: {...creatives}
             }
 
-            // console.log('result', result)
-
-            let myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
-
-            document.getElementsByClassName("confirmButton")[0].addEventListener('click', () => {
-                myModal.hide()
-                submitAssets(result)
-            })
-
-            document.getElementsByClassName("cancelButton")[0].addEventListener('click', () => {
-                myModal.hide()
-                document.getElementsByClassName("submitBtn")[0].style.display = "block";
-                document.getElementsByClassName("loadingBtn")[0].style.display = "none";
-                // clearInterval(interval);
-                document.getElementById("spinner").style.display = "none";
-
-            })
+            document.getElementsByClassName("confirmButton")[0].addEventListener('click', confirmUpload)
+            document.getElementsByClassName("cancelButton")[0].addEventListener('click', cancelUpload)
 
             // let checkboxes = document.querySelectorAll('input[type="checkbox"]');
             // let checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
-
             let countCheckedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked').length
 
             if(countCheckedCheckboxes !== 0){
@@ -368,23 +318,23 @@
                     },
                     body: JSON.stringify(result)
                 })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.message.length > 0){
-                                const modalBody = document.getElementsByClassName("modal-body")[0]
+                .then(response => response.json())
+                .then(data => {
+                    if(data.message.length > 0){
+                        const modalBody = document.getElementsByClassName("modal-body")[0]
 
-                                showAlert(data.message, modalBody)
+                        showAlert(data.message, modalBody)
 
-                                let tagP = document.createElement("p");
-                                let text = document.createTextNode("Would you like to update the assets of the selected creatives?");
-                                tagP.appendChild(text);
-                                modalBody.appendChild(tagP);
-                                myModal.show()
-                            } else {
-                                submitAssets(result)
-                            }
-
-                        }).catch(err => {
+                        let tagP = document.createElement("p");
+                        let text = document.createTextNode("Would you like to update the assets of the selected creatives?");
+                        tagP.appendChild(text);
+                        modalBody.appendChild(tagP);
+                        myModal.show()
+                    } else {
+                        submitAssets(result)
+                    }
+                })
+                .catch(err => {
                     console.log(err)
                 })
             } else {
@@ -409,14 +359,15 @@
                         let alertContainer = document.getElementsByClassName('alertMsg')[0]
                         showAlert(data.message,  alertContainer)
                         document.getElementsByClassName("alert")[0].style.display = "block";
-
                     }
-                }).catch(err => {
+                })
+                .catch(err => {
                     console.log(err)
-                }).finally(() => {
+                })
+                .finally(() => {
                     // scroll bottom alert progress
                     let divEl = document.getElementsByClassName("alert-custom")[0];
-                    divEl.scrollTop = divEl.scrollHeight;
+                    divEl.scrollTop = divEl.scrollHeight + 20;
                 })
             }, 3000)
 
@@ -430,16 +381,20 @@
             })
             .then(response => response.json())
             .then(data => {
-                // showAlert(data.message)
                 let alertContainer = document.getElementsByClassName('alertMsg')[0]
                 showAlert(data.message,  alertContainer)
                 document.getElementsByClassName("submitBtn")[0].style.display = "block";
                 document.getElementsByClassName("loadingBtn")[0].style.display = "none";
                 clearInterval(interval);
                 document.getElementById("spinner").style.display = "none";
-
-            }).catch(err => {
+            })
+            .catch(err => {
                 console.log(err)
+            })
+            .finally(() => {
+                // TODO Check remove
+                document.getElementsByClassName("confirmButton")[0].removeEventListener('click', confirmUpload)
+                document.getElementsByClassName("cancelButton")[0].removeEventListener('click', cancelUpload)
             })
         }
 
