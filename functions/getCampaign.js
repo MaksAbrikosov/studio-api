@@ -1,21 +1,21 @@
 const axios = require("axios");
 const config = require("../config");
 
-function getCampaign(campaignId, advertiserId, ownerId, xsrfToken){
+function getCampaign(accountParameters, xsrfToken){
 
     const arguments = [
         {
-            "id":advertiserId,
+            "id":accountParameters.advertiserId,
             "entityKey":{
-                "entityId":advertiserId,
-                "ownerId":ownerId
+                "entityId":accountParameters.advertiserId,
+                "ownerId":accountParameters.ownerId
             }
         },
         {
-            "id":campaignId,
+            "id":accountParameters.campaignId,
             "entityKey":{
-                "entityId":campaignId,
-                "ownerId":ownerId
+                "entityId":accountParameters.campaignId,
+                "ownerId":accountParameters.ownerId
             }
         }
     ]
@@ -48,7 +48,6 @@ function getCampaign(campaignId, advertiserId, ownerId, xsrfToken){
         mode: "cors",
     })
         .then(response => {
-            // console.log(response.data)
             return response.data
         })
         .catch(err => console.error(err.response));

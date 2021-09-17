@@ -31,9 +31,7 @@ async function getXsrfToken(){
             const node = root.querySelector('script')
             const xsrfTokenString = node.rawText.split(',').filter(val => val.match(/xsrfToken/))[0]
             // const xsrfToken = xsrfTokenString.replace(' "xsrfToken": ', "")
-            console.log('xsrfTokenString', xsrfTokenString)
             if(xsrfTokenString) {
-                console.log('!!!')
                 const xsrfToken = xsrfTokenString.split('"')[3]
                 return xsrfToken
             }

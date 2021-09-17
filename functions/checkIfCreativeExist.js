@@ -8,7 +8,7 @@ const getCampaign = require("./getCampaign")
 
 let accountId;
 
-async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativePath, data) {
+async function checkIfCreativeExist(accountParameters, data) {
 
     let creative;
 
@@ -19,7 +19,7 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
     }
 
     const allCreativesFromStudio = await getAllCreatives(xsrfToken);
-    const campaign = await getCampaign(campaignId, advertiserId, ownerId, xsrfToken)
+    const campaign = await getCampaign(accountParameters, xsrfToken)
     accountId = campaign.account.id;
 
     const messages = []
@@ -33,12 +33,10 @@ async function checkIfCreativeExist(campaignId, advertiserId, ownerId, creativeP
 
                 const fullNameForAlert = `${creativeName}${size}`
 
-                let filePath = path.join(creativePath, creativeName+size);
+                let filePath = path.join(accountParameters.creativePath, creativeName+size);
                 const form = new FormData();
                 form.append("folder", fs.createReadStream(filePath));
                 creative = allCreativesFromStudio.records.find((item) => item.name === creativeName+size);
-
-
 
                 if (creative) {
                     messages.push(fullNameForAlert)
