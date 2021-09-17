@@ -322,7 +322,6 @@
                 .then(data => {
                     if(data.message.length > 0){
                         const modalBody = document.getElementsByClassName("modal-body")[0]
-
                         showAlert(data.message, modalBody)
 
                         let tagP = document.createElement("p");

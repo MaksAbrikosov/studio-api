@@ -11,6 +11,7 @@ const parseConfigFile = require("../functions/parseConfigFile")
 const  addCreativeDirPath = require("../functions/addCreativeDirPath")
 
 let accountParameters = {}
+let creativesData = {}
 
 router.get('/', async (req, res) => {
 
@@ -30,60 +31,66 @@ router.get('/', async (req, res) => {
 
 router.post('/check-assets',  async (req, res) => {
     const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
-    const {pathToFolder} = parseConfigFile()
+    // const {pathToFolder} = parseConfigFile()
 
     let  result
 
-    const filteredData = Object.keys(creatives).reduce((acc, key) => {
+    creativesData = Object.keys(creatives).reduce((acc, key) => {
         if(creatives[key].data.length){
             acc[key] = creatives[key]
         }
         return acc
     }, {})
 
-    if(Object.keys(filteredData).length > 0){
-        result = await checkIfCreativeExist(campaignId, advertiserId, ownerId, creativePath, filteredData)
+    accountParameters = { campaignId, advertiserId, ownerId, creativePath}
+
+    if(Object.keys(creativesData).length > 0){
+        result = await checkIfCreativeExist(accountParameters, creativesData)
     }
 
     const {accountId, xsrfToken, allCreativesFromStudio} = result
 
-    accountParameters = { accountId, xsrfToken, allCreativesFromStudio}
+    accountParameters = { ...accountParameters, accountId, xsrfToken, allCreativesFromStudio}
 
     res.status(200).json({message: result.messages })
 })
 
 router.post('/complete',  async (req, res) => {
-    const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
+    // const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
 
-    const {pathToFolder} = parseConfigFile()
+    // const {pathToFolder} = parseConfigFile()
 
-    const filteredData = Object.keys(creatives).reduce((acc, key) => {
-        if(creatives[key].data.length){
-            acc[key] = creatives[key]
-        }
-        return acc
-    }, {})
+    // const filteredData = Object.keys(creatives).reduce((acc, key) => {
+    //     if(creatives[key].data.length){
+    //         acc[key] = creatives[key]
+    //     }
+    //     return acc
+    // }, {})
 
-    accountParameters = {...accountParameters, campaignId, advertiserId, ownerId, creativePath, creatives: filteredData}
+    // accountParameters = {...accountParameters, campaignId, advertiserId, ownerId, creativePath, creatives: filteredData}
 
-    if(Object.keys(filteredData).length > 0){
+    console.log(accountParameters)
+    if(Object.keys(creativesData).length > 0){
         // await start( campaignId, advertiserId, ownerId, creativePath, filteredData, accountParameters)
-        await start(accountParameters, filteredData)
+        await start(accountParameters, creativesData)
     }
 
-    if(!pathToFolder.length>0){
-        await addCreativeDirPath(creativePath)
-    }
-    await addCreativeDirPath(creativePath)
+    // if(!pathToFolder.length>0){
+    //     await addCreativeDirPath(accountParameters.creativePath)
+    // }
+
+    await addCreativeDirPath(accountParameters.creativePath)
 
     res.status(200).json({message: progressUpload()})
 })
 
-router.post('/check',  async (req, res) => {
+router.post('/check-campaign',  async (req, res) => {
     const { campaignId, advertiserId, ownerId } = req.body
     const xsrfToken = await getXsrfToken()
 
-    const campaign = await getCampaign(campaignId, advertiserId, ownerId, xsrfToken)
+    accountParameters = { campaignId, advertiserId, ownerId}
+
+    const campaign = await getCampaign(accountParameters, xsrfToken)
 
     if(campaign){
         res.status(200).json({

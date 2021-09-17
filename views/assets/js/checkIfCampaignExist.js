@@ -16,7 +16,7 @@ function checkCampaign(){
         ownerId
     }
 
-    fetch("/check", {
+    fetch("/check-campaign", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
