@@ -61,9 +61,11 @@
                 </div>
             </div>
 
-            <div class="card text-dark bg-light mb-3 formCard" id="testCon">
+<!--            <div class="card text-dark bg-light mb-3 formCard" id="testCon">-->
+            <div class=" text-dark bg-light mb-3 formCard" id="testCon">
 
-            {{#each creatives}}
+
+                {{#each creatives}}
                 <div class="card text-dark bg-light mb-3 cardIn" >
                     <div class="card-header">
                         <div class="mb-3 mt-2">
@@ -72,9 +74,9 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <p>Sizes</p>
+<!--                        <p>Sizes</p>-->
                         {{#each this}}
-                            <div class="form-check">
+                            <div class="form-check checkCard">
                                 <input class="form-check-input me-1" name="{{@index}}" type="checkbox" value="{{ this }}"  data-id="el{{@index}}" />
                                 <label for="check" class="lab">{{@../key}}_{{ this }}</label>
                             </div>
@@ -162,8 +164,8 @@
             const cardBody = document.createElement("div")
             cardBody.setAttribute('class', 'card-body')
 
-            const bodyText = document.createElement("p")
-            bodyText.innerHTML = "Sizes"
+            // const bodyText = document.createElement("p")
+            // bodyText.innerHTML = "Sizes"
 
             const text = document.createElement("p")
             text.innerHTML = nameCreative
@@ -181,12 +183,12 @@
             headerDiv.appendChild(input)
 
             card.appendChild(cardBody)
-            cardBody.appendChild(bodyText)
+            // cardBody.appendChild(bodyText)
 
             data[nameCreative].forEach((name, index) => {
 
                 const formCheckClass = document.createElement("div")
-                formCheckClass.setAttribute('class', 'form-check')
+                formCheckClass.setAttribute('class', 'form-check checkCard')
 
                 const checkBox = document.createElement("input")
                 checkBox.setAttribute('class', 'form-check-input me-1')
