@@ -47,9 +47,65 @@
     background-color: #5f6477;
     border-color: #3c3f4c;
 }
+
+/*.configuration input{*/
+/*    background: #434656;*/
+/*    color: #fff;*/
+/*}*/
+
+/*.configuration input:focus{*/
+/*    background: #31364e;*/
+/*    color: #fff;*/
+/*}*/
+
 .configuration .form-label{
     color: #fff;
 }
 .configuration .card-header{
     border-bottom: 1px solid rgb(253 253 253 / 24%);
+}
+
+.checkCard{
+    border: 1px solid #bebdbd;
+    border-radius: 6px;
+    margin: 10px 0;
+    padding: 6px 35px;
+    font-weight: 400;
+    box-shadow: 0 0 5px 1px rgb(169 169 169 / 23%);
+
+    /*light grey*/
+    /*background: #e8e7e7;*/
+
+    /*white*/
+    background: #fff;
+
+    /*dark grey*/
+    /*background: #5f6477;*/
+    /*color: #fff;*/
+
+    /*green*/
+    /*background: #00ce9b;*/
+}
+
+.formCard .card-body{
+    /*dark*/
+    /*background: #494d5f;*/
+
+    /*light grey*/
+    /*background: #fbfbfb;*/
+
+
+    background: #eaeaea;
+
+}
+
+.formCard .card-header{
+
+    /*light*/
+    /*background: #fbfbfb;*/
+
+    /*dark grey*/
+    /*background: #373b4e;*/
+    /*color: #fff;*/
+    /*border-bottom: 1px solid #9d9d9d;*/
 }
