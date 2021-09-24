@@ -35,20 +35,20 @@ async function start(accountParameters, data) {
                     entityId = creative.entityRef.entityKey.entityId;
 
                     console.log(`Creative ${fullNameForAlert} has already exist! Updating...!`)
-                    progressUpload(`Creative ${fullNameForAlert} has already exist! Updating...!`)
+                    progressUpload({type: "add", message: `Creative ${fullNameForAlert} has already exist! Updating...!`})
 
                     const assetsArray = await getAssetsFromCreative(accountParameters, creativeId, entityId);
 
                     if(assetsArray && assetsArray.length > 0){
                         await removeAssets(assetsArray, accountParameters, creativeId, entityId);
                         console.log('Assets deleted');
-                        progressUpload(`Assets deleted`)
+                        progressUpload({type: "add", message: `Assets deleted!`})
                     }
                 } else {
                     // create a new creative in Studio
                     creativeId = await createNewCreative(creativeName, size, accountParameters)
                     console.log(`Creative ${creativeName}${size} created!`);
-                    progressUpload(`Creative ${fullNameForAlert} created!`)
+                    progressUpload({type: "add", message: `Creative ${fullNameForAlert} created!`})
                 }
 
                 await readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert, creativeId);

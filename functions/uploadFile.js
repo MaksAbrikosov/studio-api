@@ -28,12 +28,13 @@ async function uploadFile(url, setCookie, form, fileName, fullNameForAlert){
     })
         .then(() => {
             console.log(`File ${fileName} was uploaded`)
-            progressUpload(`Creative ${fullNameForAlert} was uploaded`)
-            progressUpload(`-------------------------------------------------`)
+            progressUpload({type: "add", message: `Creative ${fullNameForAlert} was uploaded`})
+            progressUpload({type: "add", message: `-------------------------------------------------`})
         })
         .catch(err =>{
             console.error(err.response)
             progressUpload(`Error! ${fullNameForAlert} - ${err.response.statusText}`)
+            progressUpload({type: "add", message: `Error! ${fullNameForAlert} - ${err.response.statusText}`})
         });
 }
 

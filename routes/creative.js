@@ -70,6 +70,8 @@ router.post('/complete',  async (req, res) => {
 
     // accountParameters = {...accountParameters, campaignId, advertiserId, ownerId, creativePath, creatives: filteredData}
 
+    progressUpload({type: 'clear'})
+
     if(Object.keys(creativesData).length > 0){
         // await start( campaignId, advertiserId, ownerId, creativePath, filteredData, accountParameters)
         await start(accountParameters, creativesData)

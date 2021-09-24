@@ -35,12 +35,12 @@ async function getXsrfToken(){
                 const xsrfToken = xsrfTokenString.split('"')[3]
                 return xsrfToken
             }
-            progressUpload("Error! Update please config file!")
+            progressUpload({type: "add", message: `Error! Update please config file!`})
 
         })
         .catch(err => {
             console.error(err);
-            progressUpload("Error! Update please config file!")
+            progressUpload({type: "add", message: `Error! Update please config file!`})
         });
 }
 
