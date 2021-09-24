@@ -42,7 +42,7 @@
 
                         <div class="mb-3">
                             <label for="path" class="form-label">Creative Folder Path</label>
-                            <input type="path" class="form-control col-md-8" id="path" placeholder="path" value={{ pathToFolder}}>
+                            <input type="path" class="form-control col-md-8" id="path" placeholder="path">
                         </div>
 
                         <div class="mb-3">
@@ -133,6 +133,12 @@
 
         <!--let decodedJsonData = decodeURIComponent("{{{encodedJsonData}}}");-->
         <!--let jsonObj = JSON.parse(decodedJsonData);-->
+
+
+        let decodedJsonPathToFolder = decodeURIComponent("{{{pathToFolder}}}");
+        let pathToFolder = JSON.parse(decodedJsonPathToFolder);
+
+        document.getElementById('path').value = pathToFolder
 
         let cardObj = {}
         let changedName = false

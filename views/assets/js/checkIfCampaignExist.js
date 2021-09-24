@@ -5,6 +5,8 @@ function checkCampaign(){
 
     const { campaignId, advertiserId, ownerId} = parseCampaignUrl()
 
+    console.log(campaignId, advertiserId, ownerId)
+
     if(!campaignId && !advertiserId && !ownerId){
         showAlert(' <strong>Error! Please check campaign URL</strong> ')
         return;

@@ -24,7 +24,8 @@ router.get('/', async (req, res) => {
 
     res.render('index', {
         creatives: data,
-        pathToFolder: pathToFolder,
+        // pathToFolder: pathToFolder,
+        pathToFolder: encodeURIComponent(JSON.stringify(pathToFolder)),
         encodedJsonData : encodeURIComponent(JSON.stringify(data)),
     })
 })
@@ -69,7 +70,6 @@ router.post('/complete',  async (req, res) => {
 
     // accountParameters = {...accountParameters, campaignId, advertiserId, ownerId, creativePath, creatives: filteredData}
 
-    console.log(accountParameters)
     if(Object.keys(creativesData).length > 0){
         // await start( campaignId, advertiserId, ownerId, creativePath, filteredData, accountParameters)
         await start(accountParameters, creativesData)
@@ -86,6 +86,7 @@ router.post('/complete',  async (req, res) => {
 
 router.post('/check-campaign',  async (req, res) => {
     const { campaignId, advertiserId, ownerId } = req.body
+
     const xsrfToken = await getXsrfToken()
 
     accountParameters = { campaignId, advertiserId, ownerId}
