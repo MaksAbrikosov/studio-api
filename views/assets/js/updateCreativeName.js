@@ -24,7 +24,7 @@ function updateValue(node, nameId, value){
             }
         }
     )
-    changedName = true
+    // changedName = true
     if(!cardObj[nameId]) {
         cardObj[nameId] = arrSizes
     }
@@ -40,6 +40,8 @@ const updateCreativeName = () => {
     document.querySelectorAll('.cardIn').forEach((node, i) => {
         node.querySelector('.creativeName').addEventListener("input", function() {
             const nameId = node.getElementsByClassName('creativeName')[0].id
+            const changedCreativesName =node.querySelector('.creativeName').getAttribute('value')
+            changedName[changedCreativesName] = true
             debouncedUpdateValue(node, nameId, this.value)
         })
     })

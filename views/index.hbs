@@ -141,15 +141,27 @@
         document.getElementById('path').value = pathToFolder
 
         let cardObj = {}
-        let changedName = false
+        // let changedName = false
         let creatives = {}
         let result = {}
 
+        let changedName = {}
+
         let myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
 
-       document.querySelectorAll('.cardIn input[type="text"]').forEach(el => {
-           Object.assign(cardObj, {[el.id] : null })
-        })
+       // document.querySelectorAll('.cardIn input[type="text"]').forEach(el => {
+       //     Object.assign(cardObj, {[el.id] : null })
+       //     changed[el.getAttribute('value')] = false
+       //  })
+
+        const readDisplayedCreatives = () => {
+            document.querySelectorAll('.cardIn input[type="text"]').forEach(el => {
+                Object.assign(cardObj, {[el.id] : null })
+                changedName[el.getAttribute('value')] = false
+            })
+        }
+
+        readDisplayedCreatives()
 
         const template = (nameCreative, index, data) => {
             const card = document.createElement("div")
@@ -228,6 +240,7 @@
         const creativePath = document.getElementById('path').addEventListener('input', (e) => {
             creatives = {}
             cardObj = {}
+
             const localPath = e.target.value
             fetch("/chooseDir", {
                 method: "POST",
@@ -243,6 +256,8 @@
                     container.removeChild(container.firstChild);
                 }
                 display(data)
+                changedName = {}
+                readDisplayedCreatives()
             })
         })
 
@@ -274,13 +289,14 @@
 
             let newName;
             document.querySelectorAll('.cardIn').forEach(node=> {
-                if(changedName){
-                     newName = node.querySelector('input[type=text]').value
-                } else {
-                     newName = node.querySelector('input[type=text]').value+"_"
-                }
 
                 const originName = node.querySelector('input[type=text]').getAttribute('value')
+                if(changedName[originName]){
+                    newName = node.querySelector('input[type=text]').value
+                } else {
+                    newName = node.querySelector('input[type=text]').value+"_"
+                }
+
                 const checked = [...node.querySelectorAll('input[type=checkbox]:checked')].map(e=> e.value)
 
                 creatives[originName] = {
@@ -295,6 +311,19 @@
                 showAlert('<strong>Creative folder path is empty!</strong> Please enter URL')
                 return;
             }
+
+            // console.log('creatives', creatives)
+            // console.log('result', result)
+            //
+            // Object.keys(creatives).map(oldName => {
+            //     Object.values(creatives).map(creative => {
+            //         if( `${oldName}_` === creative.newName){
+            //             console.log(oldName, creative.newName)
+            //         } else {
+            //             console.log(oldName, creative.newName)
+            //         }
+            //     })
+            // })
 
              result = {
                 campaignId,
