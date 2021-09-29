@@ -27,9 +27,8 @@ async function uploadFile(url, setCookie, form, fileName, fullNameForAlert){
         mode: "cors",
     })
         .then(() => {
-            console.log(`File ${fileName} was uploaded`)
+            console.log(`File ${fullNameForAlert} was uploaded`)
             progressUpload({type: "add", message: `Creative ${fullNameForAlert} was uploaded`})
-            progressUpload({type: "add", message: `-------------------------------------------------`})
         })
         .catch(err =>{
             console.error(err.response)
