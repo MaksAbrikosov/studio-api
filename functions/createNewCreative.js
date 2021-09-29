@@ -54,7 +54,10 @@ async function createNewCreative(creativeName, size, accountParameters) {
         mode: "cors"
     })
         .then(response => {
-            return response.data.id
+            return {
+                id: response.data.id,
+                entityKey: response.data.entityRef.entityKey
+            }
         })
         .catch(err => console.error(err));
 }
