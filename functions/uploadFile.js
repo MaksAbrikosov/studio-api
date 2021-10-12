@@ -19,7 +19,7 @@ async function uploadFile(url, setCookie, form, fileName, fullNameForAlert){
             "x-goog-upload-command": "upload, finalize",
             "x-goog-upload-file-name": fileName,
             "x-goog-upload-offset": "0",
-            "cookie": `${config.Secure3PSID} ${config.SID}`,
+            "cookie": `__Secure-3PSID=${config.Secure3PSID}; SID=${config.SID};`,
         },
         referrer: "https://www.google.com/doubleclick/studio/",
         referrerPolicy: "strict-origin-when-cross-origin",

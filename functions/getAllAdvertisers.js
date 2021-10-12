@@ -27,7 +27,7 @@ function getAllAdvertisers(){
         "content-type": "text/plain",
           // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
           "x-xsrf-token": "AMUEn62zXQ0oV5WkAROO970szyyRABWyFw:1623938273924",
-        "cookie": config.Secure3PSID
+          "cookie": `__Secure-3PSID=${config.Secure3PSID}; SID=${config.SID};`,
   
       },
       referrerPolicy: "strict-origin-when-cross-origin",

@@ -46,7 +46,7 @@ async function createNewCreative(creativeName, size, accountParameters) {
             "content-type": "text/plain",
             // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCN3yywE=",
             "x-xsrf-token": accountParameters.xsrfToken,
-            "cookie": `${config.Secure3PSID} ${config.SID}`
+            "cookie": `__Secure-3PSID=${config.Secure3PSID}; SID=${config.SID};`,
         },
         referrerPolicy: "strict-origin-when-cross-origin",
         data: JSON.stringify(payload),

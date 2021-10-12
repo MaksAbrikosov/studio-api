@@ -26,7 +26,7 @@ async function getAllCampaigns(xsrfToken){
         "content-type": "text/plain",
         // "x-client-data": "CI22yQEIpLbJAQjEtskBCKmdygEIuv3KAQigoMsBCNzyywE=",
         "x-xsrf-token": xsrfToken,
-        "cookie": config.Secure3PSID
+        "cookie": `__Secure-3PSID=${config.Secure3PSID}; SID=${config.SID};`,
       },
       referrerPolicy: "strict-origin-when-cross-origin",
       data: JSON.stringify(payload),
