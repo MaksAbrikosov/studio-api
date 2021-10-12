@@ -64,6 +64,9 @@
 <!--            <div class="card text-dark bg-light mb-3 formCard" id="testCon">-->
             <div class=" text-dark bg-light mb-3 formCard" id="testCon">
 
+                <div class="checkAll">
+                    <input type="checkbox" class="form-check-input" onClick="selectAllCheckboxes(this)" /> Select All<br/>
+                </div>
 
                 {{#each creatives}}
                 <div class="card text-dark bg-light mb-3 cardIn" >
@@ -130,6 +133,14 @@
     <script src="/js/updateCreativeName.js"></script>
 
     <script>
+
+        function selectAllCheckboxes(source) {
+            let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i] !== source)
+                    checkboxes[i].checked = source.checked;
+            }
+        }
 
         <!--let decodedJsonData = decodeURIComponent("{{{encodedJsonData}}}");-->
         <!--let jsonObj = JSON.parse(decodedJsonData);-->
