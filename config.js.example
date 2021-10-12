@@ -1,5 +1,5 @@
 module.exports = {
     CreativeDir: "local/path/to/creatives/folder",
-    Secure3PSID: "__Secure-3PSID=_wfc9dVMXilW7jigEu7TZ7V4ZBPwOVaCnEygUUwc_MU5hF0Ml-is41niBh_LN7ZqdSYg7w.;",
-    SID: "SID=_wfc9dVMXilW7jigEu7TZ7V4ZBPwOVaCnEygUUwc_MU5hF0MVulbqPpX7SzfNyHlMKwj3g.",
+    Secure3PSID: "_wfc9dVMXilW7jigEu7TZ7V4ZBPwOVaCnEygUUwc_MU5hF0Ml-is41niBh_LN7ZqdSYg7w.",
+    SID: "_wfc9dVMXilW7jigEu7TZ7V4ZBPwOVaCnEygUUwc_MU5hF0MVulbqPpX7SzfNyHlMKwj3g.",
 }

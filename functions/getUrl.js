@@ -22,7 +22,7 @@ const config = require("../config");
       "x-goog-upload-command": "start",
       "x-goog-upload-file-name": fileName,
       "x-goog-upload-protocol": "resumable",
-      cookie: `${config.Secure3PSID} ${config.SID}`,
+        "cookie": `__Secure-3PSID=${config.Secure3PSID}; SID=${config.SID};`,
     },
     referrer: "https://www.google.com/doubleclick/studio/",
     referrerPolicy: "strict-origin-when-cross-origin",
