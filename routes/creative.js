@@ -57,19 +57,6 @@ router.post('/check-assets',  async (req, res) => {
 })
 
 router.post('/complete',  async (req, res) => {
-    // const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
-
-    // const {pathToFolder} = parseConfigFile()
-
-    // const filteredData = Object.keys(creatives).reduce((acc, key) => {
-    //     if(creatives[key].data.length){
-    //         acc[key] = creatives[key]
-    //     }
-    //     return acc
-    // }, {})
-
-    // accountParameters = {...accountParameters, campaignId, advertiserId, ownerId, creativePath, creatives: filteredData}
-
     progressUpload({type: 'clear'})
 
     if(Object.keys(creativesData).length > 0){
