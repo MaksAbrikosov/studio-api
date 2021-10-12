@@ -109,3 +109,14 @@
     /*color: #fff;*/
     /*border-bottom: 1px solid #9d9d9d;*/
 }
+
+
+.checkAll{
+    border: 1px solid #bebdbd;
+    border-radius: 6px;
+    margin: 10px 0;
+    padding: 6px 20px;
+    font-weight: 400;
+    background: #eaeaea;
+    box-shadow: 0 0 5px 1px rgb(169 169 169 / 23%);
+}
