@@ -10,10 +10,17 @@ const searchBackupImage = require("./searchBackupImage");
 const setBackupImage = require("./setBackupImage");
 const progressUpload = require("./progressUpload")
 
+let countUploaded = 0
+let totalCountCreatives = 0
+
+const increaseCountUploaded = () => countUploaded++
+
 async function start(accountParameters, data) {
     let creative;
     let creativeId;
     let entityId;
+
+    Object.values(data).map(creative => creative.data.length).map(item => totalCountCreatives = totalCountCreatives + item)
 
     try {
         for (const name of Object.keys(data)) {
@@ -59,7 +66,7 @@ async function start(accountParameters, data) {
                     progressUpload({type: "add", message: `Creative ${fullNameForAlert} created!`})
                 }
 
-                await readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert, creativeId);
+                await readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert, creativeId, increaseCountUploaded);
 
                 const backupImage = await searchBackupImage(creativeId, accountParameters, entityId);
 
@@ -79,6 +86,9 @@ async function start(accountParameters, data) {
             }
         }
         console.log('Done')
+        progressUpload({type: "add", message: `Uploading creatives... (${countUploaded}/${totalCountCreatives})`})
+        countUploaded = 0
+        totalCountCreatives = 0
     } catch (err) {
         console.error(err);
     }

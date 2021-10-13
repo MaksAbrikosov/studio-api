@@ -2,7 +2,7 @@ const axios = require("axios");
 const config = require("../config");
 const progressUpload = require("./progressUpload")
 
-async function uploadFile(url, setCookie, form, fileName, fullNameForAlert){
+async function uploadFile(url, setCookie, form, fileName, fullNameForAlert, increaseCountUploaded){
 
     await axios({
         method: 'post',
@@ -29,6 +29,7 @@ async function uploadFile(url, setCookie, form, fileName, fullNameForAlert){
         .then(() => {
             console.log(`File ${fullNameForAlert} was uploaded`)
             progressUpload({type: "add", message: `Creative ${fullNameForAlert} was uploaded`})
+            increaseCountUploaded()
         })
         .catch(err =>{
             console.error(err.response)
