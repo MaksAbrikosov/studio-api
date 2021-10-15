@@ -23,6 +23,7 @@ async function checkIfCreativeExist(accountParameters, data) {
     accountId = campaign.account.id;
 
     const messages = []
+    const imageSizeMessages = []
 
     try {
         for(const name of Object.keys(data)){
@@ -38,6 +39,22 @@ async function checkIfCreativeExist(accountParameters, data) {
                 form.append("folder", fs.createReadStream(filePath));
                 creative = allCreativesFromStudio.records.find((item) => item.name === creativeName+size);
 
+                let filePathLocalFolder = path.join(accountParameters.creativePath, name,size);
+                console.log('filePath', filePathLocalFolder);
+
+                fs.readdirSync(filePathLocalFolder).forEach(file => {
+                    if(file.match(/backup/)){
+                        const stats = fs.statSync(path.join(filePathLocalFolder, file))
+                        const fileSize = (stats.size / 1024).toFixed(1)
+                        console.log('fileSize', fileSize);
+                        if(fileSize > 40){
+                            imageSizeMessages.push(fullNameForAlert)
+                        }
+                    }
+                   
+                  });
+
+
                 if (creative) {
                     messages.push(fullNameForAlert)
                 }
@@ -45,6 +62,7 @@ async function checkIfCreativeExist(accountParameters, data) {
         }
         return{
             messages,
+            imageSizeMessages,
             xsrfToken,
             accountId,
             allCreativesFromStudio

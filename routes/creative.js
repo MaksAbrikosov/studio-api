@@ -53,7 +53,8 @@ router.post('/check-assets',  async (req, res) => {
 
     accountParameters = { ...accountParameters, accountId, xsrfToken, allCreativesFromStudio}
 
-    res.status(200).json({message: result.messages })
+    res.status(200).json({messageImageWarning: result.imageSizeMessages, message: result.messages})
+
 })
 
 router.post('/complete',  async (req, res) => {
