@@ -107,7 +107,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Selected creatives exist in Studio</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Warning!</h5>
                     </div>
                     <div class="modal-body">
 
@@ -368,16 +368,19 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if(data.message.length > 0){
+                    if(data.messageImageWarning.length > 0 || data.message.length > 0){
                         const modalBody = document.getElementsByClassName("modal-body")[0]
-                        showAlert(data.message, modalBody)
+                        showAlert(data.message, modalBody, data.messageImageWarning, "alert")
 
-                        let tagP = document.createElement("p");
-                        let text = document.createTextNode("Would you like to update the assets of the selected creatives?");
+                        let tagP = document.createElement("h5");
+                        tagP.setAttribute('class', 'mt-4')
+                        let text = document.createTextNode("Are you sure you want to update creatives?");
                         tagP.appendChild(text);
                         modalBody.appendChild(tagP);
                         myModal.show()
-                    } else {
+                    }
+    
+                    else {
                         submitAssets(result)
                     }
                 })

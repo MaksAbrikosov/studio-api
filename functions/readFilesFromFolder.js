@@ -9,6 +9,7 @@ let archiver = require('archiver');
 
 async function  readFilesFromFolder(creativeName, accountParameters, name, size, fullNameForAlert, creativeId, increaseCountUploaded){
 
+    console.log('name', name);
     // create archive
     const zipName = size + ".zip";
 
