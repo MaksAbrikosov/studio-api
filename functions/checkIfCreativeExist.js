@@ -37,7 +37,9 @@ async function checkIfCreativeExist(accountParameters, data) {
                 let filePath = path.join(accountParameters.creativePath, creativeName+size);
                 const form = new FormData();
                 form.append("folder", fs.createReadStream(filePath));
-                creative = allCreativesFromStudio.records.find((item) => item.name === creativeName+size);
+                // creative = allCreativesFromStudio.records.find((item) =>  item.name === creativeName+size);
+
+                creative = allCreativesFromStudio.records.find(item => item.name === creativeName+size && item.campaign.entityRef.id === Number(accountParameters.campaignId))
 
                 let filePathLocalFolder = path.join(accountParameters.creativePath, name,size);
                 console.log('filePath', filePathLocalFolder);

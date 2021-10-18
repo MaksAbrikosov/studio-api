@@ -34,11 +34,10 @@ async function start(accountParameters, data) {
                 const form = new FormData();
                 form.append("folder", fs.createReadStream(filePath));
 
-                creative = accountParameters.allCreativesFromStudio.records.find((item) => item.name === creativeName + size);
+                // creative = accountParameters.allCreativesFromStudio.records.find((item) => item.name === creativeName + size);
+                creative = accountParameters.allCreativesFromStudio.records.find(item => item.name === creativeName+size && item.campaign.entityRef.id === Number(accountParameters.campaignId))
 
                 if (creative) {
-                    // console.log('accountParameters.creative', creative)
-
                     creativeId = creative.id;
                     entityId = creative.entityRef.entityKey.entityId;
 

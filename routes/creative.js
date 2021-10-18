@@ -34,7 +34,7 @@ router.post('/check-assets',  async (req, res) => {
     const { campaignId, advertiserId, ownerId, creativePath, creatives} = req.body
     // const {pathToFolder} = parseConfigFile()
 
-    let  result
+    let result
 
     creativesData = Object.keys(creatives).reduce((acc, key) => {
         if(creatives[key].data.length){
