@@ -102,7 +102,11 @@ router.post('/chooseDir',  async (req, res) => {
     if(localPath.length>0){
         data = await readCreativeDirectory(localPath)
     }
-    res.status(400).json(data)
+    if(data){
+        res.status(400).json(data)
+    } else {
+        res.status(400).json({})
+    }
 })
 
 router.get('/progress',  async (req, res) => {
