@@ -61,12 +61,20 @@
                 </div>
             </div>
 
+            <div class="noCreatives">
+                <div class="card text-dark bg-light mb-3" >
+                    <div class="card-body">
+                        <p class="text-center">Please check the path to the creatives folder</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkAll">
+                <input type="checkbox" class="form-check-input" onClick="selectAllCheckboxes(this)" /> Select All<br/>
+            </div>
+
 <!--            <div class="card text-dark bg-light mb-3 formCard" id="testCon">-->
             <div class=" text-dark bg-light mb-3 formCard" id="testCon">
-
-                <div class="checkAll">
-                    <input type="checkbox" class="form-check-input" onClick="selectAllCheckboxes(this)" /> Select All<br/>
-                </div>
 
                 {{#each creatives}}
                 <div class="card text-dark bg-light mb-3 cardIn" >
@@ -263,10 +271,20 @@
             .then(response => response.json())
             .then(data => {
                 let container = document.getElementById('testCon')
+                const tt = document.getElementsByClassName('noCreatives')
+
                 while (container.firstChild) {
                     container.removeChild(container.firstChild);
                 }
-                display(data)
+                if(Object.keys(data).length === 0){
+                    document.getElementsByClassName('noCreatives')[0].style.display = "block"
+                    document.getElementsByClassName('checkAll')[0].style.display = "none"
+                } else {
+                    display(data)
+                    document.getElementsByClassName('noCreatives')[0].style.display = "none"
+                    document.getElementsByClassName('checkAll')[0].style.display = "block"
+                }
+              
                 changedName = {}
                 readDisplayedCreatives()
             })

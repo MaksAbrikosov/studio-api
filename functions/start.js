@@ -85,7 +85,7 @@ async function start(accountParameters, data) {
             }
         }
         console.log('Done')
-        progressUpload({type: "add", message: `Uploading creatives... (${countUploaded}/${totalCountCreatives})`})
+        progressUpload({type: "add", message: `Uploaded creatives... (${countUploaded}/${totalCountCreatives})`})
         countUploaded = 0
         totalCountCreatives = 0
     } catch (err) {
